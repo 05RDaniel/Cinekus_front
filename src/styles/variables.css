@@ -1,0 +1,26 @@
+:root {
+  /* Marca */
+  --color-primary: #283593;
+  --color-secondary: #007f1c;
+  --color-accent: #7a4a1b;
+
+  /* Superficies */
+  --color-background: #f3f4f6;
+  --color-card: #ffffff;
+
+  /* Texto */
+  --color-text: #1e1e1e;
+  --color-text-secondary: #6c757d;
+
+  /* Estructura */
+  --color-border: #d9dee5;
+
+  /* Tipografía */
+  --font-brand: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-weight-logo: 700;
+  --font-weight-heading: 600;
+  --font-weight-button: 600;
+  --font-weight-body: 400;
+  --font-weight-meta: 500;
+}

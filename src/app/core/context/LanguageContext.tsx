@@ -1,14 +1,15 @@
 import { createContext, PropsWithChildren, useContext, useMemo, useState } from 'react';
-import { TranslationLanguage } from '../i18n/translations';
+
+export type Lang = 'en-US' | 'es-ES';
 
 const storageKey = 'cinekus.language';
 
 type LanguageContextValue = {
-  language: TranslationLanguage;
-  setLanguage: (language: TranslationLanguage) => void;
+  language: Lang;
+  setLanguage: (language: Lang) => void;
 };
 
-function getInitialLanguage(): TranslationLanguage {
+function getInitialLanguage(): Lang {
   const saved = localStorage.getItem(storageKey);
   if (saved === 'en-US' || saved === 'es-ES') return saved;
   return 'es-ES';
@@ -17,12 +18,12 @@ function getInitialLanguage(): TranslationLanguage {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: PropsWithChildren) {
-  const [language, setLanguageState] = useState<TranslationLanguage>(getInitialLanguage());
+  const [language, setLanguageState] = useState<Lang>(getInitialLanguage());
 
   const value = useMemo<LanguageContextValue>(
     () => ({
       language,
-      setLanguage: (nextLanguage: TranslationLanguage) => {
+      setLanguage: (nextLanguage: Lang) => {
         localStorage.setItem(storageKey, nextLanguage);
         setLanguageState(nextLanguage);
       },

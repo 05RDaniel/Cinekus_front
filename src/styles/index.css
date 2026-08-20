@@ -1,0 +1,20 @@
+/*
+ * ProyectoCine — estilos globales
+ *
+ * Layout: solo Flexbox. No usar CSS Grid en esta aplicación.
+ * Colores: variables en variables.css
+ * Tipografía: typography.css (Manrope + Inter)
+ */
+
+@import './variables.css';
+@import './typography.css';
+@import './layout.css';
+@import './header.css';
+@import './footer.css';
+@import './home.css';
+@import './cartelera.css';
+@import './movie-detail.css';
+@import './admin.css';
+@import './crud.css';
+@import './booking.css';
+@import './login.css';

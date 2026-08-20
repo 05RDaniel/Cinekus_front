@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Manrope:wght@600;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-body);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-brand);
+  font-weight: var(--font-weight-heading);
+}
+
+button,
+input[type='button'],
+input[type='submit'],
+input[type='reset'] {
+  font-family: var(--font-brand);
+  font-weight: var(--font-weight-button);
+}
+
+.text-meta {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-meta);
+}
+
+.text-logo {
+  font-family: var(--font-brand);
+  font-weight: var(--font-weight-logo);
+}
