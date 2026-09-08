@@ -8,7 +8,7 @@ export type CrudModalProps = {
   children: ReactNode;
   error?: string | null;
   isSaving?: boolean;
-  size?: 'default' | 'lg' | 'xl';
+  size?: 'default' | 'lg' | 'xl' | 'fullscreen';
   scrollable?: boolean;
   onSubmit?: (event: FormEvent) => void;
   submitLabel?: string;
@@ -38,6 +38,7 @@ export function CrudModal({
     'crud-modal__dialog',
     size === 'lg' ? 'crud-modal__dialog--lg' : '',
     size === 'xl' ? 'crud-modal__dialog--xl' : '',
+    size === 'fullscreen' ? 'crud-modal__dialog--fullscreen' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -69,7 +70,13 @@ export function CrudModal({
   return (
     <>
       <div className="crud-modal-backdrop" aria-hidden="true" onClick={isSaving ? undefined : onClose} />
-      <div className="crud-modal" tabIndex={-1} role="dialog" aria-modal="true" aria-label={title}>
+      <div
+        className={`crud-modal${size === 'fullscreen' ? ' crud-modal--fullscreen' : ''}`}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+      >
         <div className={dialogClass}>
           <div className="crud-modal__header">
             <h2 className="crud-modal__title">{title}</h2>

@@ -40,6 +40,33 @@
   max-width: 56rem;
 }
 
+.crud-modal--fullscreen {
+  padding: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.crud-modal__dialog--fullscreen {
+  width: min(82vw, 86rem);
+  max-width: min(82vw, 86rem);
+  height: min(82vh, 52rem);
+  max-height: min(82vh, 52rem);
+  border-radius: 0.85rem;
+}
+
+.crud-modal__dialog--fullscreen .crud-modal__body {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.crud-modal__dialog--fullscreen .room-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
 .crud-modal__header {
   display: flex;
   align-items: center;

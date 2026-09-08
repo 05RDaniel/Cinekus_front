@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../../../auth/context/AuthContext';
 import { CastDepartment, Movie } from '../../../features/movies/models/movie.model';
 import { getGenres, getMovie } from '../../../features/movies/services/movies.service';
 import {
@@ -60,6 +61,7 @@ function groupSessionsByDate(sessions: Session[]): { date: string; sessions: Ses
 export function MovieDetailPage() {
   const { movieId } = useParams<{ movieId: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { language } = useLanguage();
   const texts = usePageTexts('movie-detail');
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -320,9 +322,9 @@ export function MovieDetailPage() {
             <button
               type="button"
               className="admin-btn"
-              disabled={!selectedSession}
+              disabled={!selectedSession || !isAuthenticated}
               onClick={() => {
-                if (!selectedSession) return;
+                if (!selectedSession || !isAuthenticated) return;
                 setShowSessions(false);
                 navigate(`/reservar/${selectedSession.id}`);
               }}
@@ -333,6 +335,18 @@ export function MovieDetailPage() {
         }
       >
         <div className="movie-detail-page__sessions" aria-live="polite">
+          {!isAuthenticated && (
+            <p className="movie-detail-page__status movie-detail-page__status--auth" role="status">
+              {texts.sessionsLoginRequired}{' '}
+              <Link
+                className="movie-detail-page__auth-link"
+                to="/login"
+                state={{ from: Number.isFinite(parsedId) ? `/cartelera/${parsedId}` : '/cartelera' }}
+              >
+                {texts.sessionsLoginLink}
+              </Link>
+            </p>
+          )}
           {sessionsLoading && <p className="movie-detail-page__status">{texts.sessionsLoading}</p>}
           {!sessionsLoading && sessionsError && (
             <p className="movie-detail-page__status movie-detail-page__status--error">{texts.sessionsError}</p>

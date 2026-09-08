@@ -45,6 +45,17 @@
   background-color: #f8d7da;
 }
 
+.movie-detail-page__status--auth {
+  color: var(--color-text);
+  border-color: var(--color-primary);
+  background-color: rgba(40, 53, 147, 0.08);
+}
+
+.movie-detail-page__auth-link {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-meta);
+}
+
 .movie-detail-page__layout {
   display: flex;
   align-items: stretch;

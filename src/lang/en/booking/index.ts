@@ -22,11 +22,14 @@ export default {
     title: 'Select your seats',
     hint: 'You must choose exactly {count} seat(s).',
     screen: 'Screen',
+    zoomReset: 'Fit',
   },
   legend: {
     available: 'Available',
     selected: 'Selected',
     occupied: 'Taken',
+    vip: 'VIP',
+    accessible: 'Accessible',
   },
   details: {
     title: 'Buyer details',
@@ -55,7 +58,7 @@ export default {
     confirming: 'Booking...',
   },
   auth: {
-    required: 'You must sign in to confirm the booking.',
+    required: 'You must sign in to book seats.',
     login: 'Sign in',
   },
   success: {

@@ -25,6 +25,8 @@ export default {
   sessionsSelected: 'Selected session',
   sessionsContinue: 'Continue',
   sessionsContinueHint: 'Choose seats in the next step.',
+  sessionsLoginRequired: 'Sign in to continue with the booking.',
+  sessionsLoginLink: 'Sign in',
   sessionsCancel: 'Close',
   room: 'Room',
   language: 'Language',

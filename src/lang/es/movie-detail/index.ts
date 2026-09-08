@@ -25,6 +25,8 @@ export default {
   sessionsSelected: 'Sesión seleccionada',
   sessionsContinue: 'Continuar',
   sessionsContinueHint: 'Elige asientos en el siguiente paso.',
+  sessionsLoginRequired: 'Inicia sesión para continuar con la reserva.',
+  sessionsLoginLink: 'Iniciar sesión',
   sessionsCancel: 'Cerrar',
   room: 'Sala',
   language: 'Idioma',

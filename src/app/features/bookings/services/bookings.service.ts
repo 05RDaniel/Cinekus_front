@@ -12,6 +12,8 @@ export type CreateBookingPayload = {
   session_id: number;
   seat_ids: number[];
   status_id?: number;
+  first_name?: string;
+  last_name?: string;
 };
 
 export async function getAllBookingsAdmin(filters?: AdminBookingsFilters): Promise<Booking[]> {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../../auth/context/AuthContext';
 import { createBooking } from '../../../features/bookings/services/bookings.service';
@@ -14,10 +14,12 @@ import {
 } from '../../../features/bookings/models/ticket.model';
 import { Session, formatSessionSchedule, sessionTypeLabel } from '../../../features/screenings/models/screening.model';
 import { getSessionById } from '../../../features/screenings/services/screenings.service';
-import { groupSeatsByRow, seatCode, SessionSeat } from '../../../features/seats/models/seat.model';
+import { buildSeatLayout, seatCode, SessionSeat } from '../../../features/seats/models/seat.model';
 import { getSeatsBySession } from '../../../features/seats/services/seats.service';
 import { useLanguage } from '../../../core/context/LanguageContext';
 import { BackButton } from '../../../shared/components/layout/BackButton';
+import { SeatIcon } from '../../../shared/components/icons/SeatIcon';
+import { useSeatMapNav } from '../../../shared/hooks/useSeatMapNav';
 import { mapApiError } from '../../../shared/utils/mapApiError';
 import { usePageTexts } from '../../../../lang';
 
@@ -44,6 +46,8 @@ export function BookingSeatsPage() {
 
   const [session, setSession] = useState<Session | null>(null);
   const [seats, setSeats] = useState<SessionSeat[]>([]);
+  const [layoutRows, setLayoutRows] = useState(0);
+  const [layoutColumns, setLayoutColumns] = useState(0);
   const [step, setStep] = useState<BookingStep>('tickets');
   const [ticketSelection, setTicketSelection] = useState<TicketSelection>(emptyTicketSelection);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -69,6 +73,8 @@ export function BookingSeatsPage() {
     if (!Number.isFinite(parsedSessionId)) {
       setSession(null);
       setSeats([]);
+      setLayoutRows(0);
+      setLayoutColumns(0);
       setHasLoadError(true);
       setIsLoading(false);
       return;
@@ -83,11 +89,15 @@ export function BookingSeatsPage() {
         getSeatsBySession(parsedSessionId),
       ]);
       setSession(sessionData);
-      setSeats(seatsData);
+      setSeats(seatsData.seats);
+      setLayoutRows(seatsData.rows);
+      setLayoutColumns(seatsData.columns);
       if (!sessionData) setHasLoadError(true);
     } catch {
       setSession(null);
       setSeats([]);
+      setLayoutRows(0);
+      setLayoutColumns(0);
       setHasLoadError(true);
     } finally {
       setIsLoading(false);
@@ -112,13 +122,33 @@ export function BookingSeatsPage() {
 
   useEffect(() => {
     if (!user || detailsPrefillDone) return;
-    setFirstName((prev) => prev || user.username || '');
+    setFirstName((prev) => prev || user.first_name || '');
+    setFirstSurname((prev) => prev || user.last_name || '');
     setEmail((prev) => prev || user.email || '');
     setEmailConfirmation((prev) => prev || user.email || '');
     setDetailsPrefillDone(true);
   }, [user, detailsPrefillDone]);
 
-  const rows = useMemo(() => groupSeatsByRow(seats), [seats]);
+  const rows = useMemo(
+    () => buildSeatLayout(layoutRows, layoutColumns, seats),
+    [layoutRows, layoutColumns, seats]
+  );
+  const { zoom, canvasSize, spaceDown, viewportRef, canvasRef, startPan, fitZoom, consumePanClick } =
+    useSeatMapNav({
+      enabled: step === 'seats',
+      measureKey: `${step}:${layoutRows}x${layoutColumns}:${seats.length}`,
+    });
+  const didAutoFit = useRef(false);
+
+  useEffect(() => {
+    if (step !== 'seats') {
+      didAutoFit.current = false;
+      return;
+    }
+    if (didAutoFit.current || canvasSize.width < 8) return;
+    didAutoFit.current = true;
+    fitZoom();
+  }, [step, canvasSize.width, canvasSize.height, fitZoom]);
   const selectedSeats = useMemo(
     () => seats.filter((seat) => selectedIds.includes(seat.id)),
     [seats, selectedIds]
@@ -219,13 +249,17 @@ export function BookingSeatsPage() {
         user_id: user.id,
         session_id: parsedSessionId,
         seat_ids: selectedIds,
+        first_name: trimmedFirst,
+        last_name: trimmedFirstSurname,
       });
       setBookingId(booking.id);
       setConfirmedSeats(selectedCodes);
       setConfirmedTickets({ ...ticketSelection });
       setSelectedIds([]);
       const seatsData = await getSeatsBySession(parsedSessionId);
-      setSeats(seatsData);
+      setSeats(seatsData.seats);
+      setLayoutRows(seatsData.rows);
+      setLayoutColumns(seatsData.columns);
     } catch (error) {
       setActionError(
         mapApiError(error, {
@@ -414,34 +448,87 @@ export function BookingSeatsPage() {
                       {texts.seats.hint.replace('{count}', String(ticketCount))}
                     </p>
 
-                    <div className="booking-page__screen" aria-hidden="true">
-                      {texts.seats.screen}
-                    </div>
-
-                    <div className="booking-page__legend">
+                    <div className="booking-page__map-tools">
+                      <div className="booking-page__legend">
                       <span className="booking-page__legend-item">
-                        <span className="booking-page__seat booking-page__seat--legend" />
+                        <span className="booking-page__seat booking-page__seat--legend">
+                          <SeatIcon />
+                        </span>
                         {texts.legend.available}
                       </span>
                       <span className="booking-page__legend-item">
-                        <span className="booking-page__seat booking-page__seat--legend booking-page__seat--selected" />
+                        <span className="booking-page__seat booking-page__seat--legend booking-page__seat--vip">
+                          <SeatIcon />
+                        </span>
+                        {texts.legend.vip}
+                      </span>
+                      <span className="booking-page__legend-item">
+                        <span className="booking-page__seat booking-page__seat--legend booking-page__seat--accessible">
+                          <SeatIcon />
+                        </span>
+                        {texts.legend.accessible}
+                      </span>
+                      <span className="booking-page__legend-item">
+                        <span className="booking-page__seat booking-page__seat--legend booking-page__seat--selected">
+                          <SeatIcon />
+                        </span>
                         {texts.legend.selected}
                       </span>
                       <span className="booking-page__legend-item">
-                        <span className="booking-page__seat booking-page__seat--legend booking-page__seat--occupied" />
+                        <span className="booking-page__seat booking-page__seat--legend booking-page__seat--occupied">
+                          <SeatIcon />
+                        </span>
                         {texts.legend.occupied}
                       </span>
+                      </div>
+                      <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={fitZoom}>
+                        {texts.seats.zoomReset}
+                      </button>
                     </div>
 
-                    <div className="booking-page__rows">
-                      {rows.map(({ row, seats: rowSeats }) => (
+                    <div
+                      ref={viewportRef}
+                      className={`room-layout__viewport booking-page__map-viewport${spaceDown ? ' room-layout__viewport--pan' : ''}`}
+                      onMouseDown={(event) => {
+                        if (event.button === 1 || spaceDown) {
+                          event.preventDefault();
+                          startPan(event);
+                        }
+                      }}
+                    >
+                      <div className="room-layout__track">
+                        <div
+                          className="room-layout__sizer"
+                          style={{ width: canvasSize.width * zoom, height: canvasSize.height * zoom }}
+                        >
+                          <div
+                            ref={canvasRef}
+                            className="room-layout__canvas"
+                            style={{ transform: `scale(${zoom})` }}
+                          >
+                            <div className="room-layout__screen booking-page__screen" aria-hidden="true">
+                              {texts.seats.screen}
+                            </div>
+                            <div className="booking-page__rows">
+                      {rows.map(({ row, cells }) => (
                         <div key={row} className="booking-page__row">
                           <span className="booking-page__row-label">{row}</span>
                           <div className="booking-page__row-seats">
-                            {rowSeats.map((seat) => {
+                            {cells.map((seat, colIndex) => {
+                              if (!seat) {
+                                return (
+                                  <span
+                                    key={`${row}-empty-${colIndex}`}
+                                    className="booking-page__seat booking-page__seat--empty"
+                                    aria-hidden="true"
+                                  />
+                                );
+                              }
                               const isSelected = selectedIds.includes(seat.id);
                               const className = [
                                 'booking-page__seat',
+                                seat.seat_type === 'vip' ? 'booking-page__seat--vip' : '',
+                                seat.seat_type === 'accessible' ? 'booking-page__seat--accessible' : '',
                                 seat.occupied ? 'booking-page__seat--occupied' : '',
                                 isSelected ? 'booking-page__seat--selected' : '',
                               ]
@@ -457,9 +544,18 @@ export function BookingSeatsPage() {
                                   aria-pressed={isSelected}
                                   aria-label={seatCode(seat)}
                                   title={seatCode(seat)}
-                                  onClick={() => toggleSeat(seat)}
+                                  onMouseDown={(event) => {
+                                    if (event.button === 1 || spaceDown) {
+                                      event.preventDefault();
+                                      startPan(event);
+                                    }
+                                  }}
+                                  onClick={() => {
+                                    if (consumePanClick()) return;
+                                    toggleSeat(seat);
+                                  }}
                                 >
-                                  {seat.number}
+                                  <SeatIcon />
                                 </button>
                               );
                             })}
@@ -467,6 +563,10 @@ export function BookingSeatsPage() {
                           <span className="booking-page__row-label">{row}</span>
                         </div>
                       ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {actionError && (
@@ -585,15 +685,6 @@ export function BookingSeatsPage() {
                           required
                         />
                       </label>
-
-                      {!isAuthenticated && (
-                        <div className="booking-page__auth-hint">
-                          <p>{texts.auth.required}</p>
-                          <button type="button" className="admin-btn" onClick={goToLogin}>
-                            {texts.auth.login}
-                          </button>
-                        </div>
-                      )}
 
                       {actionError && (
                         <p className="booking-page__status booking-page__status--error" role="alert">

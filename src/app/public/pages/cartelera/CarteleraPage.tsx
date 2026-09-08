@@ -90,7 +90,7 @@ export function CarteleraPage() {
                           </>
                         )}
                       </p>
-                      {genres && <p className="cartelera-card__genres">{genres}</p>}
+                      <p className="cartelera-card__genres">{genres || '\u00a0'}</p>
                       <p className="cartelera-card__synopsis">{sinopsis || '—'}</p>
                     </div>
                   </Link>

@@ -5,6 +5,8 @@ export default {
     columns: {
       id: 'ID',
       name: 'Name',
+      size: 'Grid',
+      seats: 'Seats',
       actions: 'Actions',
     },
     states: {
@@ -24,6 +26,21 @@ export default {
     closeAriaLabel: 'Close',
     fields: {
       name: 'Name',
+      rows: 'Rows',
+      columns: 'Columns',
+      map: 'Seat map',
+      screen: 'Screen',
+      selectAll: 'Select all',
+      clearSelection: 'Clear selection',
+      selectedCount: '{count} selected',
+      assign: 'Assign type',
+      zoomReset: 'Fit',
+    },
+    types: {
+      standard: 'Standard',
+      vip: 'VIP',
+      accessible: 'Accessible',
+      none: 'None',
     },
     buttons: {
       cancel: 'Cancel',
@@ -33,6 +50,7 @@ export default {
     },
     errors: {
       missingFields: 'Enter a name',
+      noSeats: 'The room must have at least one seat.',
       sessionExpired: 'Session expired or invalid. Sign in again with an ADMIN user.',
       forbidden: 'You do not have permission (ADMIN role required).',
       generic: 'Could not save the room',

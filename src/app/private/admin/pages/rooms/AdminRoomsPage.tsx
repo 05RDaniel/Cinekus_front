@@ -1,6 +1,20 @@
 import { FormEvent, useCallback } from 'react';
-import { Room } from '../../../../features/rooms/models/room.model';
-import { createRoom, deleteRoom, getRooms, updateRoom } from '../../../../features/rooms/services/rooms.service';
+import {
+  clampDimension,
+  createSeatGrid,
+  gridFromRoomSeats,
+  MAX_ROOM_COLS,
+  MAX_ROOM_ROWS,
+  Room,
+  seatsFromGrid,
+} from '../../../../features/rooms/models/room.model';
+import {
+  createRoom,
+  deleteRoom,
+  getRoom,
+  getRooms,
+  updateRoom,
+} from '../../../../features/rooms/services/rooms.service';
 import { AdminTableStates } from '../../../../shared/components/crud/AdminTableStates';
 import { CrudModal } from '../../../../shared/components/crud/CrudModal';
 import { AdminPageHeader } from '../../../../shared/components/layout/AdminPageHeader';
@@ -32,9 +46,25 @@ export function AdminRoomsPage() {
 
   const errorMessages = texts.modal.errors;
 
-  const openCreateModal = () => openCreate();
+  const openCreateModal = () => openCreate({ ...emptyRoomForm, grid: createSeatGrid(5, 8) });
 
-  const openEditModal = (room: Room) => openEdit(room.id, { name: room.name ?? '' });
+  const openEditModal = async (room: Room) => {
+    try {
+      setFormError(null);
+      const detail = await getRoom(room.id);
+      const rowCount = clampDimension(detail.rows || 1, 1, MAX_ROOM_ROWS);
+      const colCount = clampDimension(detail.columns || 1, 1, MAX_ROOM_COLS);
+      openEdit(room.id, {
+        name: detail.name ?? '',
+        rows: rowCount,
+        columns: colCount,
+        grid: gridFromRoomSeats(rowCount, colCount, detail.seats ?? []),
+      });
+    } catch (error) {
+      setHasLoadError(true);
+      setFormError(mapApiError(error, errorMessages));
+    }
+  };
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -43,15 +73,26 @@ export function AdminRoomsPage() {
       return;
     }
 
+    const seats = seatsFromGrid(formValues.grid);
+    if (seats.length === 0) {
+      setFormError(errorMessages.noSeats);
+      return;
+    }
+
     setIsSaving(true);
     setFormError(null);
 
     try {
-      const name = formValues.name.trim();
+      const payload = {
+        name: formValues.name.trim(),
+        rows: formValues.rows,
+        columns: formValues.columns,
+        seats,
+      };
       if (editingId) {
-        await updateRoom(editingId, { name });
+        await updateRoom(editingId, payload);
       } else {
-        await createRoom({ name });
+        await createRoom(payload);
       }
       await reload();
       setIsModalOpen(false);
@@ -91,12 +132,14 @@ export function AdminRoomsPage() {
               <tr>
                 <th>{texts.table.columns.id}</th>
                 <th>{texts.table.columns.name}</th>
+                <th>{texts.table.columns.size}</th>
+                <th>{texts.table.columns.seats}</th>
                 <th>{texts.table.columns.actions}</th>
               </tr>
             </thead>
             <tbody>
               <AdminTableStates
-                colSpan={3}
+                colSpan={5}
                 isLoading={isLoading}
                 hasLoadError={hasLoadError}
                 isEmpty={rows.length === 0}
@@ -109,11 +152,23 @@ export function AdminRoomsPage() {
                     <td>{row.id}</td>
                     <td>{row.name}</td>
                     <td>
+                      {row.rows && row.columns ? `${row.rows}×${row.columns}` : '—'}
+                    </td>
+                    <td>{row.seat_count ?? '—'}</td>
+                    <td>
                       <div className="admin-table__actions">
-                        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => openEditModal(row)}>
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--ghost admin-btn--sm"
+                          onClick={() => void openEditModal(row)}
+                        >
                           {texts.table.actions.edit}
                         </button>
-                        <button type="button" className="admin-btn admin-btn--danger admin-btn--sm" onClick={() => void onDelete(row)}>
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--danger admin-btn--sm"
+                          onClick={() => void onDelete(row)}
+                        >
                           {texts.table.actions.delete}
                         </button>
                       </div>
@@ -133,11 +188,28 @@ export function AdminRoomsPage() {
           onSubmit={onSubmit}
           isSaving={isSaving}
           error={formError}
+          size="fullscreen"
           cancelLabel={texts.modal.buttons.cancel}
           submitLabel={editingId ? texts.modal.buttons.saveChanges : texts.modal.buttons.create}
           savingLabel={texts.modal.buttons.saving}
         >
-          <AdminRoomForm values={formValues} onChange={setFormValues} label={texts.modal.fields.name} />
+          <AdminRoomForm
+            values={formValues}
+            onChange={setFormValues}
+            labels={{
+              name: texts.modal.fields.name,
+              rows: texts.modal.fields.rows,
+              columns: texts.modal.fields.columns,
+              map: texts.modal.fields.map,
+              screen: texts.modal.fields.screen,
+              types: texts.modal.types,
+              selectAll: texts.modal.fields.selectAll,
+              clearSelection: texts.modal.fields.clearSelection,
+              selectedCount: texts.modal.fields.selectedCount,
+              assign: texts.modal.fields.assign,
+              zoomReset: texts.modal.fields.zoomReset,
+            }}
+          />
         </CrudModal>
       </div>
     </section>

@@ -5,6 +5,8 @@ export default {
     columns: {
       id: 'ID',
       name: 'Nombre',
+      size: 'Cuadrícula',
+      seats: 'Asientos',
       actions: 'Acciones',
     },
     states: {
@@ -24,6 +26,21 @@ export default {
     closeAriaLabel: 'Cerrar',
     fields: {
       name: 'Nombre',
+      rows: 'Filas',
+      columns: 'Columnas',
+      map: 'Mapa de asientos',
+      screen: 'Pantalla',
+      selectAll: 'Seleccionar todo',
+      clearSelection: 'Limpiar selección',
+      selectedCount: '{count} seleccionados',
+      assign: 'Asignar tipo',
+      zoomReset: 'Ajustar',
+    },
+    types: {
+      standard: 'Estándar',
+      vip: 'VIP',
+      accessible: 'Accesible',
+      none: 'No existe',
     },
     buttons: {
       cancel: 'Cancelar',
@@ -33,6 +50,7 @@ export default {
     },
     errors: {
       missingFields: 'Introduce un nombre',
+      noSeats: 'La sala debe tener al menos un asiento.',
       sessionExpired: 'Sesión caducada o no válida. Inicia sesión de nuevo con un usuario ADMIN.',
       forbidden: 'No tienes permiso (se requiere rol ADMIN).',
       generic: 'No se pudo guardar la sala',

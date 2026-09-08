@@ -9,6 +9,7 @@ import { BookingSeatsPage } from './public/pages/booking/BookingSeatsPage';
 import { LoginPage } from './auth/pages/LoginPage';
 import { RegisterPage } from './auth/pages/RegisterPage';
 import { AdminRoute } from './auth/components/AdminRoute';
+import { AuthRoute } from './auth/components/AuthRoute';
 import { HomeAdminPage } from './private/admin/pages/home/HomeAdminPage';
 import { AdminMoviesPage } from './private/admin/pages/movies/AdminMoviesPage';
 import { AdminSessionsPage } from './private/admin/pages/sessions/AdminSessionsPage';
@@ -26,7 +27,14 @@ export function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/cartelera/:movieId" element={<MovieDetailPage />} />
           <Route path="/cartelera" element={<CarteleraPage />} />
-          <Route path="/reservar/:sessionId" element={<BookingSeatsPage />} />
+          <Route
+            path="/reservar/:sessionId"
+            element={
+              <AuthRoute>
+                <BookingSeatsPage />
+              </AuthRoute>
+            }
+          />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route

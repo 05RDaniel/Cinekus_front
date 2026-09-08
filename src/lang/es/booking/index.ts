@@ -22,11 +22,14 @@ export default {
     title: 'Selecciona tus asientos',
     hint: 'Debes elegir exactamente {count} asiento(s).',
     screen: 'Pantalla',
+    zoomReset: 'Ajustar',
   },
   legend: {
     available: 'Libre',
     selected: 'Seleccionado',
     occupied: 'Ocupado',
+    vip: 'VIP',
+    accessible: 'Accesible',
   },
   details: {
     title: 'Datos del comprador',
@@ -55,7 +58,7 @@ export default {
     confirming: 'Reservando...',
   },
   auth: {
-    required: 'Debes iniciar sesión para confirmar la reserva.',
+    required: 'Debes iniciar sesión para reservar.',
     login: 'Iniciar sesión',
   },
   success: {

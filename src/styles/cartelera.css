@@ -43,13 +43,16 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
   gap: 1.25rem;
 }
 
 .cartelera-card {
-  flex: 1 1 16rem;
-  max-width: calc(33.333% - 0.85rem);
-  min-width: 15rem;
+  box-sizing: border-box;
+  flex: 0 0 calc((100% - 2.5rem) / 3);
+  width: calc((100% - 2.5rem) / 3);
+  max-width: calc((100% - 2.5rem) / 3);
+  min-width: 0;
 }
 
 .cartelera-card__link {
@@ -110,6 +113,11 @@
   font-size: 1.05rem;
   line-height: 1.3;
   color: var(--color-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6em;
 }
 
 .cartelera-card__meta,
@@ -118,7 +126,12 @@
   font-family: var(--font-body);
   font-weight: var(--font-weight-meta);
   font-size: 0.8rem;
+  line-height: 1.3;
+  min-height: 1.3em;
   color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cartelera-card__genres {
@@ -129,6 +142,7 @@
   margin: 0.35rem 0 0;
   font-size: 0.85rem;
   line-height: 1.45;
+  min-height: calc(1.45em * 3);
   color: var(--color-text-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -138,13 +152,16 @@
 
 @media (max-width: 900px) {
   .cartelera-card {
-    max-width: calc(50% - 0.65rem);
+    flex-basis: calc((100% - 1.25rem) / 2);
+    width: calc((100% - 1.25rem) / 2);
+    max-width: calc((100% - 1.25rem) / 2);
   }
 }
 
 @media (max-width: 560px) {
   .cartelera-card {
+    flex-basis: 100%;
+    width: 100%;
     max-width: 100%;
-    min-width: 0;
   }
 }

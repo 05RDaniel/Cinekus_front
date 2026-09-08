@@ -290,9 +290,18 @@
   text-align: left;
 }
 
+.booking-page__map-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  flex-shrink: 0;
+}
+
 .booking-page__screen {
-  margin: 0 auto 0.5rem;
-  width: min(100%, 28rem);
+  margin: 0 calc(var(--seat-map-label) + var(--seat-map-label-gap));
+  width: auto;
   padding: 0.55rem 1rem;
   text-align: center;
   border-radius: 0.35rem 0.35rem 50% 50% / 0.35rem 0.35rem 1rem 1rem;
@@ -309,7 +318,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.85rem 1.25rem;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .booking-page__legend-item {
@@ -320,13 +329,21 @@
   color: var(--color-text-secondary);
 }
 
+.booking-page__map-viewport {
+  min-height: 18rem;
+  height: min(28rem, 55vh);
+}
+
+.booking-page__map-viewport .room-layout__canvas {
+  --seat-map-label-gap: 0.55rem;
+}
+
 .booking-page__rows {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
   align-items: center;
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
+  width: max-content;
 }
 
 .booking-page__row {
@@ -336,7 +353,7 @@
 }
 
 .booking-page__row-label {
-  width: 1.25rem;
+  width: 1.6rem;
   text-align: center;
   font-family: var(--font-brand);
   font-weight: var(--font-weight-heading);
@@ -356,49 +373,73 @@
   width: 2rem;
   height: 2rem;
   padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 0.4rem;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-meta);
-  font-size: 0.75rem;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition: color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 }
 
-.booking-page__seat:hover:not(:disabled) {
-  border-color: var(--color-primary);
+.booking-page__seat svg {
+  display: block;
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+.booking-page__seat:hover:not(:disabled):not(.booking-page__seat--occupied) {
   color: var(--color-primary);
   transform: translateY(-1px);
 }
 
+.booking-page__seat--vip:not(.booking-page__seat--selected):not(.booking-page__seat--occupied) {
+  color: var(--color-accent);
+}
+
+.booking-page__seat--accessible:not(.booking-page__seat--selected):not(.booking-page__seat--occupied) {
+  color: var(--color-secondary);
+}
+
+.booking-page__seat--empty,
+.booking-page__seat--empty:hover {
+  visibility: hidden;
+  cursor: default;
+  pointer-events: none;
+  transform: none;
+}
+
 .booking-page__seat--selected {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-card);
+  background-color: transparent;
+  color: var(--color-primary);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+  border-radius: 0.35rem;
 }
 
 .booking-page__seat--selected:hover:not(:disabled) {
-  color: var(--color-card);
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
+  color: var(--color-primary);
+  background-color: transparent;
 }
 
 .booking-page__seat--occupied,
 .booking-page__seat--occupied:hover {
-  background-color: #cfd4dc;
-  border-color: #cfd4dc;
-  color: #6c757d;
+  background-color: transparent;
+  color: var(--color-border);
   cursor: not-allowed;
   transform: none;
+  opacity: 0.7;
 }
 
 .booking-page__seat--legend {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.25rem;
+  height: 1.25rem;
   pointer-events: none;
   cursor: default;
+}
+
+.booking-page__seat--legend svg {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .booking-page__summary {
