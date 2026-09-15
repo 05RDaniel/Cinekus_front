@@ -6,5 +6,6 @@ export default {
     sessions: 'Sessions',
     users: 'Users',
     reservations: 'Reservations',
+    prices: 'Prices',
   },
 } as const;

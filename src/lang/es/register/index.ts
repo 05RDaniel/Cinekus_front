@@ -2,7 +2,9 @@ export default {
   title: 'Crear cuenta',
   subtitle: 'Regístrate para reservar entradas.',
   fields: {
-    usernameLabel: 'Usuario',
+    firstNameLabel: 'Nombre',
+    lastNameLabel: 'Apellido',
+    secondLastNameLabel: 'Segundo apellido (opcional)',
     emailLabel: 'Email',
     passwordLabel: 'Contraseña',
     passwordConfirmLabel: 'Confirmar contraseña',

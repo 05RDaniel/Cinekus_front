@@ -2,12 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   clampDimension,
   createSeatGrid,
-  LAYOUT_SEAT_TYPES,
   LayoutSeatType,
   MAX_ROOM_COLS,
   MAX_ROOM_ROWS,
   resizeSeatGrid,
 } from '../../../../features/rooms/models/room.model';
+import { layoutSeatClass, SeatTypePrice } from '../../../../features/bookings/models/ticket.model';
 import { SeatIcon } from '../../../../shared/components/icons/SeatIcon';
 import { useSeatMapNav } from '../../../../shared/hooks/useSeatMapNav';
 import { seatRowLabel } from '../../../../features/seats/models/seat.model';
@@ -24,13 +24,19 @@ type CellPos = { row: number; col: number };
 type AdminRoomFormProps = {
   values: RoomFormValues;
   onChange: (values: RoomFormValues) => void;
+  seatTypes: SeatTypePrice[];
   labels: {
     name: string;
     rows: string;
     columns: string;
     map: string;
     screen: string;
-    types: Record<LayoutSeatType, string>;
+    types: {
+      standard: string;
+      vip: string;
+      accessible: string;
+      none: string;
+    };
     selectAll: string;
     clearSelection: string;
     selectedCount: string;
@@ -57,7 +63,7 @@ function cellsInRect(start: CellPos, end: CellPos): string[] {
   return keys;
 }
 
-export function AdminRoomForm({ values, onChange, labels }: AdminRoomFormProps) {
+export function AdminRoomForm({ values, onChange, seatTypes, labels }: AdminRoomFormProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [dragCurrent, setDragCurrent] = useState<CellPos | null>(null);
   const { zoom, canvasSize, spaceDown, viewportRef, canvasRef, startPan, fitZoom, consumePanClick } =
@@ -181,6 +187,17 @@ export function AdminRoomForm({ values, onChange, labels }: AdminRoomFormProps) 
     setDragCurrent({ row, col });
   };
 
+  const typeOptions: LayoutSeatType[] = useMemo(
+    () => ['none', ...seatTypes.map((type) => type.name)],
+    [seatTypes]
+  );
+
+  const typeLabel = (type: LayoutSeatType) => {
+    if (type === 'none') return labels.types.none;
+    if (type === 'standard' || type === 'vip' || type === 'accessible') return labels.types[type];
+    return seatTypes.find((item) => item.name === type)?.label || type;
+  };
+
   const applyType = (type: LayoutSeatType) => {
     if (selected.size === 0) return;
     const grid = values.grid.map((row) => [...row]);
@@ -279,18 +296,18 @@ export function AdminRoomForm({ values, onChange, labels }: AdminRoomFormProps) 
               {labels.zoomReset}
             </button>
             <div className="room-layout__brushes" role="group" aria-label={labels.assign}>
-              {LAYOUT_SEAT_TYPES.map((type) => (
+              {typeOptions.map((type) => (
                 <button
                   key={type}
                   type="button"
-                  className={`room-layout__brush room-layout__brush--${type}`}
+                  className={`room-layout__brush room-layout__brush--${layoutSeatClass(type)}`}
                   disabled={selected.size === 0}
                   onClick={() => applyType(type)}
                 >
-                  <span className={`room-layout__swatch room-layout__swatch--${type}`}>
+                  <span className={`room-layout__swatch room-layout__swatch--${layoutSeatClass(type)}`}>
                     {type !== 'none' ? <SeatIcon /> : null}
                   </span>
-                  {labels.types[type]}
+                  {typeLabel(type)}
                 </button>
               ))}
             </div>
@@ -339,14 +356,14 @@ export function AdminRoomForm({ values, onChange, labels }: AdminRoomFormProps) 
                               type="button"
                               className={[
                                 'room-layout__cell',
-                                `room-layout__cell--${type}`,
+                                `room-layout__cell--${layoutSeatClass(type)}`,
                                 selectedCell ? 'room-layout__cell--selected' : '',
                               ]
                                 .filter(Boolean)
                                 .join(' ')}
                               aria-pressed={selectedCell}
-                              aria-label={`${seatRowLabel(rowIndex + 1)}-${colIndex + 1}: ${labels.types[type]}`}
-                              title={`${seatRowLabel(rowIndex + 1)}-${colIndex + 1} · ${labels.types[type]}`}
+                              aria-label={`${seatRowLabel(rowIndex + 1)}-${colIndex + 1}: ${typeLabel(type)}`}
+                              title={`${seatRowLabel(rowIndex + 1)}-${colIndex + 1} · ${typeLabel(type)}`}
                               onMouseDown={(event) => {
                                 if (event.button === 1 || spaceDown) {
                                   event.preventDefault();

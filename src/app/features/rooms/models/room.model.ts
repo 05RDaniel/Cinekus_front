@@ -1,10 +1,8 @@
-export type BookableSeatType = 'standard' | 'vip' | 'accessible';
+export type BookableSeatType = string;
 
 export type LayoutSeatType = BookableSeatType | 'none';
 
 export const BOOKABLE_SEAT_TYPES: BookableSeatType[] = ['standard', 'vip', 'accessible'];
-
-export const LAYOUT_SEAT_TYPES: LayoutSeatType[] = ['standard', 'vip', 'accessible', 'none'];
 
 export const MAX_ROOM_ROWS = 35;
 export const MAX_ROOM_COLS = 50;

@@ -62,7 +62,6 @@ export function Header() {
         <nav className="app-header__nav" aria-label="Principal">
           <Link to="/home">{texts.navigation.home}</Link>
           <Link to="/cartelera">{texts.navigation.nowShowing}</Link>
-          <a href="#">{texts.navigation.offers}</a>
           {isAdmin && <Link to="/admin/home">{texts.navigation.admin}</Link>}
         </nav>
 
@@ -91,15 +90,93 @@ export function Header() {
                 <Link to="/cartelera" role="menuitem" onClick={() => setMenuOpen(false)}>
                   {texts.navigation.nowShowing}
                 </Link>
-                <a href="#" role="menuitem" onClick={() => setMenuOpen(false)}>
-                  {texts.navigation.offers}
-                </a>
+                {isAuthenticated && (
+                  <>
+                    <Link to="/perfil" role="menuitem" onClick={() => setMenuOpen(false)}>
+                      {texts.menu.profile}
+                    </Link>
+                    <Link to="/mis-reservas" role="menuitem" onClick={() => setMenuOpen(false)}>
+                      {texts.menu.myBookings}
+                    </Link>
+                  </>
+                )}
                 {isAdmin && (
                   <Link to="/admin/home" role="menuitem" onClick={() => setMenuOpen(false)}>
                     {texts.navigation.admin}
                   </Link>
                 )}
               </nav>
+
+              <div className="app-header__dropdown-section">
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/perfil"
+                      className="app-header__user"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="app-header__user-name">
+                        {[user?.first_name, user?.last_name].filter(Boolean).join(' ') || user?.username}
+                      </span>
+                      <span className="app-header__user-email">{user?.email}</span>
+                    </Link>
+                    <Link
+                      to="/perfil"
+                      className="app-header__action app-header__action--primary"
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {texts.menu.profile}
+                    </Link>
+                    <Link
+                      to="/mis-reservas"
+                      className="app-header__action app-header__action--ghost"
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {texts.menu.myBookings}
+                    </Link>
+                    <button
+                      type="button"
+                      className="app-header__action app-header__action--ghost"
+                      role="menuitem"
+                      onClick={() => {
+                        logout();
+                        setMenuOpen(false);
+                      }}
+                    >
+                      {texts.menu.logoutButton}
+                    </button>
+                  </>
+                ) : (
+                  <div className="app-header__auth-actions">
+                    <button
+                      type="button"
+                      className="app-header__action app-header__action--primary"
+                      role="menuitem"
+                      onClick={onOpenLogin}
+                    >
+                      {texts.menu.loginButton}
+                    </button>
+                    <button
+                      type="button"
+                      className="app-header__action app-header__action--ghost"
+                      role="menuitem"
+                      onClick={onOpenRegister}
+                    >
+                      {texts.menu.registerButton}
+                    </button>
+                    <Link
+                      to="/mis-reservas"
+                      className="app-header__action app-header__action--ghost"
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {texts.menu.myBookings}
+                    </Link>
+                  </div>
+                )}
+              </div>
 
               <div className="app-header__dropdown-section">
                 <span className="app-header__dropdown-label" id="language-label">
@@ -131,47 +208,6 @@ export function Header() {
                     {texts.menu.languageEnglish}
                   </button>
                 </div>
-              </div>
-
-              <div className="app-header__dropdown-section">
-                {isAuthenticated ? (
-                  <>
-                    <div className="app-header__user">
-                      <span className="app-header__user-name">{user?.username}</span>
-                      <span className="app-header__user-email">{user?.email}</span>
-                    </div>
-                    <button
-                      type="button"
-                      className="app-header__action app-header__action--ghost"
-                      role="menuitem"
-                      onClick={() => {
-                        logout();
-                        setMenuOpen(false);
-                      }}
-                    >
-                      {texts.menu.logoutButton}
-                    </button>
-                  </>
-                ) : (
-                  <div className="app-header__auth-actions">
-                    <button
-                      type="button"
-                      className="app-header__action app-header__action--primary"
-                      role="menuitem"
-                      onClick={onOpenLogin}
-                    >
-                      {texts.menu.loginButton}
-                    </button>
-                    <button
-                      type="button"
-                      className="app-header__action app-header__action--ghost"
-                      role="menuitem"
-                      onClick={onOpenRegister}
-                    >
-                      {texts.menu.registerButton}
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           )}

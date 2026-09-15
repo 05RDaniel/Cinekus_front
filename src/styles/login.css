@@ -48,9 +48,19 @@
   margin: 0;
   padding: 0.75rem 0.9rem;
   border-radius: 0.55rem;
-  border: 1px solid #f1aeb5;
-  background-color: #f8d7da;
-  color: #842029;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-accent);
+  font-size: 0.9rem;
+}
+
+.login-page__success {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-secondary);
   font-size: 0.9rem;
 }
 

@@ -16,6 +16,9 @@ import { AdminSessionsPage } from './private/admin/pages/sessions/AdminSessionsP
 import { AdminRoomsPage } from './private/admin/pages/rooms/AdminRoomsPage';
 import { AdminUsersPage } from './private/admin/pages/users/AdminUsersPage';
 import { AdminBookingsPage } from './private/admin/pages/bookings/AdminBookingsPage';
+import { AdminPricesPage } from './private/admin/pages/prices/AdminPricesPage';
+import { MyBookingsPage } from './public/pages/account/MyBookingsPage';
+import { ProfilePage } from './public/pages/account/ProfilePage';
 
 export function App() {
   return (
@@ -37,6 +40,22 @@ export function App() {
           />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/mis-reservas"
+            element={
+              <AuthRoute>
+                <MyBookingsPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/perfil"
+            element={
+              <AuthRoute>
+                <ProfilePage />
+              </AuthRoute>
+            }
+          />
           <Route
             path="/admin/home"
             element={
@@ -82,6 +101,14 @@ export function App() {
             element={
               <AdminRoute>
                 <AdminBookingsPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/prices"
+            element={
+              <AdminRoute>
+                <AdminPricesPage />
               </AdminRoute>
             }
           />

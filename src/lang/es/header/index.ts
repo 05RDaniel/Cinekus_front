@@ -3,7 +3,6 @@ export default {
   navigation: {
     home: 'Inicio',
     nowShowing: 'Cartelera',
-    offers: 'Ofertas',
     admin: 'Admin',
     back: 'Volver',
   },
@@ -15,5 +14,7 @@ export default {
     loginButton: 'Iniciar sesión',
     registerButton: 'Registrarse',
     logoutButton: 'Cerrar sesión',
+    myBookings: 'Mis reservas',
+    profile: 'Perfil',
   },
 } as const;

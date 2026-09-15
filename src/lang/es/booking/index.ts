@@ -16,7 +16,7 @@ export default {
     senior: 'Jubilado',
     quantity: 'Cantidad',
     total: 'Total entradas',
-    price: 'Precio estimado',
+    price: 'Precio',
   },
   seats: {
     title: 'Selecciona tus asientos',
@@ -47,6 +47,8 @@ export default {
     room: 'Sala',
     tickets: 'Entradas',
     seats: 'Asientos',
+    seatSurcharge: 'Suplemento asiento',
+    total: 'Total',
     none: 'Ninguno',
     buyer: 'Comprador',
   },

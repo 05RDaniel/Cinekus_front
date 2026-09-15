@@ -3,7 +3,6 @@ export default {
   navigation: {
     home: 'Home',
     nowShowing: 'Now Showing',
-    offers: 'Offers',
     admin: 'Admin',
     back: 'Back',
   },
@@ -15,5 +14,7 @@ export default {
     loginButton: 'Sign in',
     registerButton: 'Sign up',
     logoutButton: 'Sign out',
+    myBookings: 'My bookings',
+    profile: 'Profile',
   },
 } as const;

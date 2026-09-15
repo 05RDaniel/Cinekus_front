@@ -9,8 +9,9 @@ import {
   TmdbSearchResult,
 } from '../models/movie.model';
 
-export async function getMovies(): Promise<Movie[]> {
-  const { data } = await http.get<Movie[]>(`${API_ENDPOINTS.cine}/peliculas`);
+export async function getMovies(options?: { upcoming?: boolean }): Promise<Movie[]> {
+  const query = options?.upcoming ? '?upcoming=1' : '';
+  const { data } = await http.get<Movie[]>(`${API_ENDPOINTS.cine}/peliculas${query}`);
   return data;
 }
 

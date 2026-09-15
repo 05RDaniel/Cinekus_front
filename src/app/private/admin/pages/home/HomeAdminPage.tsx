@@ -11,6 +11,7 @@ export function HomeAdminPage() {
     { title: texts.cards.sessions, route: '/admin/sessions' },
     { title: texts.cards.users, route: '/admin/users' },
     { title: texts.cards.reservations, route: '/admin/bookings' },
+    { title: texts.cards.prices, route: '/admin/prices' },
   ];
 
   return (

@@ -2,14 +2,15 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../../auth/context/AuthContext';
 import { createBooking } from '../../../features/bookings/services/bookings.service';
+import { getSeatTypePrices, getTicketTypes } from '../../../features/bookings/services/prices.service';
 import {
   emptyTicketSelection,
   formatPrice,
+  seatsSurcharge,
+  SeatTypePrice,
   TicketSelection,
-  TicketTypeId,
-  TICKET_PRICES,
-  TICKET_TYPE_IDS,
-  totalPrice,
+  TicketType,
+  ticketsSubtotal,
   totalTickets,
 } from '../../../features/bookings/models/ticket.model';
 import { Session, formatSessionSchedule, sessionTypeLabel } from '../../../features/screenings/models/screening.model';
@@ -32,7 +33,7 @@ const STEPS: BookingStep[] = ['tickets', 'seats', 'details'];
 
 export function BookingSeatsPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, updateUser } = useAuth();
   const { language } = useLanguage();
   const texts = usePageTexts('booking');
   const navigate = useNavigate();
@@ -46,6 +47,8 @@ export function BookingSeatsPage() {
 
   const [session, setSession] = useState<Session | null>(null);
   const [seats, setSeats] = useState<SessionSeat[]>([]);
+  const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
+  const [seatTypePrices, setSeatTypePrices] = useState<SeatTypePrice[]>([]);
   const [layoutRows, setLayoutRows] = useState(0);
   const [layoutColumns, setLayoutColumns] = useState(0);
   const [step, setStep] = useState<BookingStep>('tickets');
@@ -65,14 +68,22 @@ export function BookingSeatsPage() {
   const [bookingId, setBookingId] = useState<number | null>(null);
   const [confirmedSeats, setConfirmedSeats] = useState<string[]>([]);
   const [confirmedTickets, setConfirmedTickets] = useState<TicketSelection | null>(null);
+  const [confirmedTotal, setConfirmedTotal] = useState<number | null>(null);
 
   const ticketCount = totalTickets(ticketSelection);
-  const priceTotal = totalPrice(ticketSelection);
+  const ticketsAmount = ticketsSubtotal(ticketSelection, ticketTypes);
+  const seatsAmount = seatsSurcharge(
+    seats.filter((seat) => selectedIds.includes(seat.id)).map((seat) => seat.seat_type_id),
+    seatTypePrices
+  );
+  const priceTotal = ticketsAmount + seatsAmount;
 
   const loadData = async () => {
     if (!Number.isFinite(parsedSessionId)) {
       setSession(null);
       setSeats([]);
+      setTicketTypes([]);
+      setSeatTypePrices([]);
       setLayoutRows(0);
       setLayoutColumns(0);
       setHasLoadError(true);
@@ -84,18 +95,24 @@ export function BookingSeatsPage() {
       setIsLoading(true);
       setHasLoadError(false);
       setActionError(null);
-      const [sessionData, seatsData] = await Promise.all([
+      const [sessionData, seatsData, ticketTypeData, seatTypeData] = await Promise.all([
         getSessionById(parsedSessionId),
         getSeatsBySession(parsedSessionId),
+        getTicketTypes(),
+        getSeatTypePrices(),
       ]);
       setSession(sessionData);
       setSeats(seatsData.seats);
       setLayoutRows(seatsData.rows);
       setLayoutColumns(seatsData.columns);
+      setTicketTypes(ticketTypeData);
+      setSeatTypePrices(seatTypeData);
       if (!sessionData) setHasLoadError(true);
     } catch {
       setSession(null);
       setSeats([]);
+      setTicketTypes([]);
+      setSeatTypePrices([]);
       setLayoutRows(0);
       setLayoutColumns(0);
       setHasLoadError(true);
@@ -111,6 +128,7 @@ export function BookingSeatsPage() {
     setBookingId(null);
     setConfirmedSeats([]);
     setConfirmedTickets(null);
+    setConfirmedTotal(null);
     setActionError(null);
     setDetailsPrefillDone(false);
   };
@@ -124,6 +142,7 @@ export function BookingSeatsPage() {
     if (!user || detailsPrefillDone) return;
     setFirstName((prev) => prev || user.first_name || '');
     setFirstSurname((prev) => prev || user.last_name || '');
+    setSecondSurname((prev) => prev || user.second_last_name || '');
     setEmail((prev) => prev || user.email || '');
     setEmailConfirmation((prev) => prev || user.email || '');
     setDetailsPrefillDone(true);
@@ -155,17 +174,33 @@ export function BookingSeatsPage() {
   );
   const selectedCodes = useMemo(() => selectedSeats.map(seatCode).sort(), [selectedSeats]);
 
+  useEffect(() => {
+    setTicketSelection((prev) => {
+      const next = emptyTicketSelection(ticketTypes);
+      for (const type of ticketTypes) {
+        next[type.id] = prev[type.id] ?? 0;
+      }
+      return next;
+    });
+  }, [ticketTypes]);
+
   const backTo = session?.movie_id ? `/cartelera/${session.movie_id}` : '/cartelera';
 
-  const ticketLabel = (id: TicketTypeId) => texts.tickets[id];
+  const ticketLabel = (type: TicketType) => {
+    if (type.code === 'adult' || type.code === 'child' || type.code === 'senior') {
+      return texts.tickets[type.code];
+    }
+    return type.name;
+  };
 
   const ticketsSummary = useMemo(() => {
-    return TICKET_TYPE_IDS.filter((id) => ticketSelection[id] > 0)
-      .map((id) => `${ticketSelection[id]}× ${ticketLabel(id)}`)
+    return ticketTypes
+      .filter((type) => (ticketSelection[type.id] ?? 0) > 0)
+      .map((type) => `${ticketSelection[type.id]}× ${ticketLabel(type)}`)
       .join(', ');
-  }, [ticketSelection, texts.tickets]);
+  }, [ticketTypes, ticketSelection, texts.tickets]);
 
-  const setTicketQty = (id: TicketTypeId, next: number) => {
+  const setTicketQty = (id: number, next: number) => {
     setActionError(null);
     setTicketSelection((prev) => {
       const clamped = Math.max(0, Math.min(MAX_TICKETS, next));
@@ -245,16 +280,36 @@ export function BookingSeatsPage() {
     setIsSaving(true);
     setActionError(null);
     try {
+      const tickets = ticketTypes
+        .filter((type) => (ticketSelection[type.id] ?? 0) > 0)
+        .map((type) => ({ ticket_type_id: type.id, quantity: ticketSelection[type.id] }));
+
+      if (tickets.length === 0) {
+        setActionError(texts.errors.noTickets);
+        setIsSaving(false);
+        return;
+      }
+
       const booking = await createBooking({
         user_id: user.id,
         session_id: parsedSessionId,
         seat_ids: selectedIds,
+        tickets,
         first_name: trimmedFirst,
         last_name: trimmedFirstSurname,
+        second_last_name: secondSurname.trim() || undefined,
+        email: trimmedEmail,
+      });
+      updateUser({
+        first_name: trimmedFirst,
+        last_name: trimmedFirstSurname,
+        second_last_name: secondSurname.trim() || null,
+        email: trimmedEmail,
       });
       setBookingId(booking.id);
       setConfirmedSeats(selectedCodes);
       setConfirmedTickets({ ...ticketSelection });
+      setConfirmedTotal(booking.total_price ?? priceTotal);
       setSelectedIds([]);
       const seatsData = await getSeatsBySession(parsedSessionId);
       setSeats(seatsData.seats);
@@ -324,8 +379,9 @@ export function BookingSeatsPage() {
               <span className="text-meta">{texts.success.tickets}</span>
               <strong>
                 {confirmedTickets
-                  ? TICKET_TYPE_IDS.filter((id) => confirmedTickets[id] > 0)
-                      .map((id) => `${confirmedTickets[id]}× ${ticketLabel(id)}`)
+                  ? ticketTypes
+                      .filter((type) => (confirmedTickets[type.id] ?? 0) > 0)
+                      .map((type) => `${confirmedTickets[type.id]}× ${ticketLabel(type)}`)
                       .join(', ')
                   : texts.summary.none}
               </strong>
@@ -334,6 +390,12 @@ export function BookingSeatsPage() {
               <span className="text-meta">{texts.success.seats}</span>
               <strong>{confirmedSeats.join(', ')}</strong>
             </p>
+            {confirmedTotal != null && (
+              <p className="booking-page__success-line">
+                <span className="text-meta">{texts.summary.total}</span>
+                <strong>{formatPrice(confirmedTotal, language)}</strong>
+              </p>
+            )}
             <div className="booking-page__success-actions">
               <button
                 type="button"
@@ -383,12 +445,12 @@ export function BookingSeatsPage() {
                     <p className="booking-page__panel-hint">{texts.tickets.hint}</p>
 
                     <ul className="booking-page__ticket-list">
-                      {TICKET_TYPE_IDS.map((id) => (
-                        <li key={id} className="booking-page__ticket-row">
+                      {ticketTypes.map((type) => (
+                        <li key={type.id} className="booking-page__ticket-row">
                           <div className="booking-page__ticket-info">
-                            <span className="booking-page__ticket-name">{ticketLabel(id)}</span>
+                            <span className="booking-page__ticket-name">{ticketLabel(type)}</span>
                             <span className="booking-page__ticket-price">
-                              {formatPrice(TICKET_PRICES[id], language)}
+                              {formatPrice(type.price, language)}
                             </span>
                           </div>
                           <div className="booking-page__ticket-qty" aria-label={texts.tickets.quantity}>
@@ -396,18 +458,18 @@ export function BookingSeatsPage() {
                               type="button"
                               className="booking-page__qty-btn"
                               aria-label="-"
-                              disabled={ticketSelection[id] === 0}
-                              onClick={() => setTicketQty(id, ticketSelection[id] - 1)}
+                              disabled={(ticketSelection[type.id] ?? 0) === 0}
+                              onClick={() => setTicketQty(type.id, (ticketSelection[type.id] ?? 0) - 1)}
                             >
                               −
                             </button>
-                            <span className="booking-page__qty-value">{ticketSelection[id]}</span>
+                            <span className="booking-page__qty-value">{ticketSelection[type.id] ?? 0}</span>
                             <button
                               type="button"
                               className="booking-page__qty-btn"
                               aria-label="+"
                               disabled={ticketCount >= MAX_TICKETS}
-                              onClick={() => setTicketQty(id, ticketSelection[id] + 1)}
+                              onClick={() => setTicketQty(type.id, (ticketSelection[type.id] ?? 0) + 1)}
                             >
                               +
                             </button>
@@ -468,6 +530,22 @@ export function BookingSeatsPage() {
                         </span>
                         {texts.legend.accessible}
                       </span>
+                      {seatTypePrices
+                        .filter(
+                          (type) =>
+                            type.name !== 'standard' &&
+                            type.name !== 'vip' &&
+                            type.name !== 'accessible' &&
+                            seats.some((seat) => seat.seat_type === type.name)
+                        )
+                        .map((type) => (
+                          <span key={type.id} className="booking-page__legend-item">
+                            <span className="booking-page__seat booking-page__seat--legend">
+                              <SeatIcon />
+                            </span>
+                            {type.label || type.name}
+                          </span>
+                        ))}
                       <span className="booking-page__legend-item">
                         <span className="booking-page__seat booking-page__seat--legend booking-page__seat--selected">
                           <SeatIcon />
@@ -744,7 +822,7 @@ export function BookingSeatsPage() {
                         <>
                           {ticketsSummary}
                           <span className="booking-page__summary-price">
-                            {formatPrice(priceTotal, language)}
+                            {formatPrice(ticketsAmount, language)}
                           </span>
                         </>
                       ) : (
@@ -758,6 +836,17 @@ export function BookingSeatsPage() {
                       {selectedCodes.length > 0
                         ? `${selectedCodes.join(', ')} (${selectedCodes.length}/${ticketCount || '—'})`
                         : texts.summary.none}
+                      {seatsAmount > 0 ? (
+                        <span className="booking-page__summary-price">
+                          {texts.summary.seatSurcharge}: {formatPrice(seatsAmount, language)}
+                        </span>
+                      ) : null}
+                    </dd>
+                  </div>
+                  <div className="booking-page__summary-item">
+                    <dt>{texts.summary.total}</dt>
+                    <dd>
+                      <span className="booking-page__summary-price">{formatPrice(priceTotal, language)}</span>
                     </dd>
                   </div>
                   {step === 'details' && (firstName || firstSurname || secondSurname || email) && (

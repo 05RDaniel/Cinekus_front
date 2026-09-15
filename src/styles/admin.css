@@ -265,10 +265,10 @@
   background-color: var(--color-card);
 }
 
-.admin-alert--error {
-  color: #842029;
-  border-color: #f1aeb5;
-  background-color: #f8d7da;
+.admin-alert--success {
+  color: var(--color-secondary);
+  border-color: color-mix(in srgb, var(--color-secondary) 35%, var(--color-border));
+  background-color: color-mix(in srgb, var(--color-secondary) 10%, var(--color-card));
 }
 
 .admin-filters {

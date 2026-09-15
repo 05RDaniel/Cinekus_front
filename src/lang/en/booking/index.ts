@@ -16,7 +16,7 @@ export default {
     senior: 'Senior',
     quantity: 'Quantity',
     total: 'Total tickets',
-    price: 'Estimated price',
+    price: 'Price',
   },
   seats: {
     title: 'Select your seats',
@@ -47,6 +47,8 @@ export default {
     room: 'Room',
     tickets: 'Tickets',
     seats: 'Seats',
+    seatSurcharge: 'Seat surcharge',
+    total: 'Total',
     none: 'None',
     buyer: 'Buyer',
   },

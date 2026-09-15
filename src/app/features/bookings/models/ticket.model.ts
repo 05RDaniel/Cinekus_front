@@ -1,29 +1,46 @@
-export type TicketTypeId = 'adult' | 'child' | 'senior';
+export type TicketTypeCode = string;
 
-export type TicketSelection = Record<TicketTypeId, number>;
+export type TicketSelection = Record<number, number>;
 
-export const TICKET_TYPE_IDS: TicketTypeId[] = ['adult', 'child', 'senior'];
+export interface TicketType {
+  id: number;
+  code: TicketTypeCode;
+  name: string;
+  price: number;
+}
 
-export const TICKET_PRICES: Record<TicketTypeId, number> = {
-  adult: 8,
-  child: 5.5,
-  senior: 6.5,
-};
+export interface SeatTypePrice {
+  id: number;
+  name: string;
+  label: string;
+  price: number;
+}
 
-export const emptyTicketSelection = (): TicketSelection => ({
-  adult: 0,
-  child: 0,
-  senior: 0,
-});
+export const KNOWN_TICKET_CODES = ['adult', 'child', 'senior'] as const;
+
+export function emptyTicketSelection(types: TicketType[] = []): TicketSelection {
+  return Object.fromEntries(types.map((type) => [type.id, 0]));
+}
 
 export function totalTickets(selection: TicketSelection): number {
-  return TICKET_TYPE_IDS.reduce((sum, id) => sum + selection[id], 0);
+  return Object.values(selection).reduce((sum, qty) => sum + qty, 0);
 }
 
 export function formatPrice(amount: number, locale: string): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' }).format(amount);
 }
 
-export function totalPrice(selection: TicketSelection): number {
-  return TICKET_TYPE_IDS.reduce((sum, id) => sum + selection[id] * TICKET_PRICES[id], 0);
+export function ticketsSubtotal(selection: TicketSelection, types: TicketType[]): number {
+  const byId = new Map(types.map((type) => [type.id, type.price]));
+  return Object.entries(selection).reduce((sum, [id, qty]) => sum + qty * (byId.get(Number(id)) ?? 0), 0);
+}
+
+export function seatsSurcharge(seatTypeIds: number[], seatTypes: SeatTypePrice[]): number {
+  const byId = new Map(seatTypes.map((type) => [type.id, type.price]));
+  return seatTypeIds.reduce((sum, id) => sum + (byId.get(id) ?? 0), 0);
+}
+
+export function layoutSeatClass(type: string): string {
+  if (type === 'none' || type === 'vip' || type === 'accessible' || type === 'standard') return type;
+  return 'standard';
 }

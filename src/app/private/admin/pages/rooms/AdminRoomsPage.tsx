@@ -15,6 +15,7 @@ import {
   getRooms,
   updateRoom,
 } from '../../../../features/rooms/services/rooms.service';
+import { getSeatTypePrices } from '../../../../features/bookings/services/prices.service';
 import { AdminTableStates } from '../../../../shared/components/crud/AdminTableStates';
 import { CrudModal } from '../../../../shared/components/crud/CrudModal';
 import { AdminPageHeader } from '../../../../shared/components/layout/AdminPageHeader';
@@ -28,6 +29,8 @@ export function AdminRoomsPage() {
   const texts = usePageTexts('admin-rooms');
   const loadRooms = useCallback(() => getRooms(), []);
   const { rows, isLoading, hasLoadError, reload, setHasLoadError } = useInitialLoad<Room[]>(loadRooms, []);
+  const loadSeatTypes = useCallback(() => getSeatTypePrices(), []);
+  const { rows: seatTypes } = useInitialLoad(loadSeatTypes, []);
 
   const {
     isModalOpen,
@@ -196,6 +199,7 @@ export function AdminRoomsPage() {
           <AdminRoomForm
             values={formValues}
             onChange={setFormValues}
+            seatTypes={seatTypes}
             labels={{
               name: texts.modal.fields.name,
               rows: texts.modal.fields.rows,

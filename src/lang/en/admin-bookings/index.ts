@@ -15,6 +15,7 @@ export default {
       sessionStart: 'Session start',
       createdAt: 'Created',
       statusId: 'Status',
+      total: 'Total',
       actions: 'Actions',
     },
     states: {
@@ -30,6 +31,7 @@ export default {
   },
   modal: {
     titleView: 'Booking detail',
+    titleDelete: 'Delete booking',
     closeAriaLabel: 'Close',
     fields: {
       id: 'ID',
@@ -39,10 +41,26 @@ export default {
       sessionStart: 'Session start',
       createdAt: 'Created',
       statusId: 'Status',
+      total: 'Total',
+      buyerName: 'Buyer',
+      buyerEmail: 'Booking email',
+      seats: 'Seats',
+      tickets: 'Tickets',
     },
     buttons: {
       close: 'Close',
+      cancel: 'Cancel',
+      cancelBooking: 'Cancel booking',
+      restore: 'Confirm again',
+      updating: 'Updating...',
+      deleting: 'Deleting...',
     },
+    confirmCancel: 'Cancel this booking? The seats will become available.',
+    confirmRestore: 'Confirm this booking again?',
+  },
+  status: {
+    confirmed: 'confirmed',
+    cancelled: 'cancelled',
   },
   errors: {
     sessionExpired: 'Session expired or invalid. Sign in again with an ADMIN user.',

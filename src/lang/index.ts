@@ -28,6 +28,12 @@ import enAdminUsers from './en/admin-users';
 import esAdminUsers from './es/admin-users';
 import enAdminBookings from './en/admin-bookings';
 import esAdminBookings from './es/admin-bookings';
+import enAdminPrices from './en/admin-prices';
+import esAdminPrices from './es/admin-prices';
+import enMyBookings from './en/my-bookings';
+import esMyBookings from './es/my-bookings';
+import enProfile from './en/profile';
+import esProfile from './es/profile';
 
 export type LangKey = 'en' | 'es';
 
@@ -48,6 +54,9 @@ export const dictionaries = {
   'admin-rooms': { en: enAdminRooms, es: esAdminRooms },
   'admin-users': { en: enAdminUsers, es: esAdminUsers },
   'admin-bookings': { en: enAdminBookings, es: esAdminBookings },
+  'admin-prices': { en: enAdminPrices, es: esAdminPrices },
+  'my-bookings': { en: enMyBookings, es: esMyBookings },
+  profile: { en: enProfile, es: esProfile },
 } as const;
 
 export type PageKey = keyof typeof dictionaries;

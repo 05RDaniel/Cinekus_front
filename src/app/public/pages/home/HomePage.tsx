@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { HomeMovie } from '../../../features/movies/models/movie.model';
 import { getHomePopularMovies } from '../../../features/movies/services/movies.service';
 import { useLanguage } from '../../../core/context/LanguageContext';
@@ -61,7 +62,7 @@ export function HomePage() {
         const withImage = batch.filter((movie) => Boolean(movie.image));
         setMovies(withImage);
         setCenterIndex(Math.min(START_CENTER_INDEX, Math.max(0, withImage.length - 1)));
-        setHasLoadError(withImage.length === 0);
+        setHasLoadError(false);
       } catch {
         if (!mounted) return;
         setMovies([]);
@@ -147,12 +148,13 @@ export function HomePage() {
               <p className="home-page__carousel-message">{texts.alerts.retryingMessage}</p>
             )}
 
+            {!isLoading && !hasLoadError && movies.length === 0 && (
+              <p className="home-page__carousel-message">{texts.alerts.empty}</p>
+            )}
+
             {!isLoading &&
-              visibleSlides.map(({ movie, position }) => (
-                <figure
-                  key={`${movie.id}-${position}`}
-                  className={`home-page__slide home-page__slide--${position}`}
-                >
+              visibleSlides.map(({ movie, position }) => {
+                const poster = (
                   <img
                     src={movie.image}
                     alt={movie.title || texts.card.imageAlt}
@@ -161,8 +163,27 @@ export function HomePage() {
                       event.currentTarget.src = 'https://via.placeholder.com/500x750?text=No+Image';
                     }}
                   />
-                </figure>
-              ))}
+                );
+
+                return (
+                  <figure
+                    key={`${movie.id}-${position}`}
+                    className={`home-page__slide home-page__slide--${position}`}
+                  >
+                    {position === 'center' ? (
+                      <Link
+                        to={`/cartelera/${movie.id}`}
+                        className="home-page__slide-link"
+                        aria-label={texts.carousel.openMovie.replace('{title}', movie.title)}
+                      >
+                        {poster}
+                      </Link>
+                    ) : (
+                      poster
+                    )}
+                  </figure>
+                );
+              })}
           </div>
 
           {!isLoading && !hasLoadError && movies.length > 0 && (

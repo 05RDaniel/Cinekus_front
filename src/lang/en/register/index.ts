@@ -2,7 +2,9 @@ export default {
   title: 'Create account',
   subtitle: 'Sign up to book tickets.',
   fields: {
-    usernameLabel: 'Username',
+    firstNameLabel: 'First name',
+    lastNameLabel: 'Last name',
+    secondLastNameLabel: 'Second last name (optional)',
     emailLabel: 'Email',
     passwordLabel: 'Password',
     passwordConfirmLabel: 'Confirm password',

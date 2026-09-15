@@ -15,7 +15,11 @@
 @import './cartelera.css';
 @import './movie-detail.css';
 @import './admin.css';
+@import './admin-prices.css';
 @import './crud.css';
+@import './confirm-modal.css';
 @import './booking.css';
+@import './my-bookings.css';
 @import './login.css';
+@import './profile.css';
 @import './room-layout.css';

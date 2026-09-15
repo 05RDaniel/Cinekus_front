@@ -17,7 +17,9 @@ export async function login(email: string, password: string): Promise<LoginRespo
 }
 
 export type RegisterPayload = {
-  username: string;
+  first_name: string;
+  last_name: string;
+  second_last_name?: string;
   email: string;
   password: string;
   password_confirmation: string;
@@ -26,6 +28,29 @@ export type RegisterPayload = {
 export async function register(payload: RegisterPayload): Promise<LoginResponse> {
   const { data } = await http.post<LoginResponse>(`${API_ENDPOINTS.auth}/register`, payload);
   return persistSession(data);
+}
+
+export async function getMe(): Promise<User> {
+  const { data } = await http.get<User>(`${API_ENDPOINTS.auth}/me`);
+  persistUser(data);
+  return data;
+}
+
+export type ProfilePayload = {
+  first_name: string;
+  last_name: string;
+  second_last_name?: string | null;
+  email: string;
+};
+
+export async function updateProfile(payload: ProfilePayload): Promise<User> {
+  const { data } = await http.put<User>(`${API_ENDPOINTS.auth}/profile`, payload);
+  persistUser(data);
+  return data;
+}
+
+export function persistUser(user: User): void {
+  localStorage.setItem(userKey, JSON.stringify(user));
 }
 
 export function logout(): void {

@@ -1,4 +1,4 @@
-export type SeatTypeName = 'standard' | 'vip' | 'accessible';
+export type SeatTypeName = string;
 
 export interface SessionSeat {
   id: number;

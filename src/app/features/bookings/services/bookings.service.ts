@@ -11,9 +11,12 @@ export type CreateBookingPayload = {
   user_id: number;
   session_id: number;
   seat_ids: number[];
+  tickets: { ticket_type_id: number; quantity: number }[];
   status_id?: number;
-  first_name?: string;
-  last_name?: string;
+  first_name: string;
+  last_name: string;
+  second_last_name?: string;
+  email: string;
 };
 
 export async function getAllBookingsAdmin(filters?: AdminBookingsFilters): Promise<Booking[]> {
@@ -25,8 +28,31 @@ export async function getAllBookingsAdmin(filters?: AdminBookingsFilters): Promi
   return data;
 }
 
+export async function getBookingAdmin(id: number): Promise<Booking> {
+  const { data } = await http.get<Booking>(`${API_ENDPOINTS.cine}/reservas/${id}/detalle`);
+  return data;
+}
+
+export async function updateBookingStatus(
+  id: number,
+  status: 'confirmed' | 'cancelled'
+): Promise<Booking> {
+  const { data } = await http.put<Booking>(`${API_ENDPOINTS.cine}/reservas/${id}`, { status });
+  return data;
+}
+
 export async function createBooking(payload: CreateBookingPayload): Promise<Booking> {
   const { data } = await http.post<Booking>(`${API_ENDPOINTS.cine}/reservas`, payload);
+  return data;
+}
+
+export async function getBookingsByUser(userId: number): Promise<Booking[]> {
+  const { data } = await http.get<Booking[]>(`${API_ENDPOINTS.cine}/reservas/${userId}`);
+  return data;
+}
+
+export async function cancelBooking(id: number): Promise<Booking> {
+  const { data } = await http.post<Booking>(`${API_ENDPOINTS.cine}/reservas/${id}/cancel`);
   return data;
 }
 

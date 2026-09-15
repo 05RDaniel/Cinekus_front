@@ -1,31 +1,28 @@
 # Frontend (React + Vite)
 
-Frontend migrado a React con TypeScript y Vite.
+App pública y panel admin. Habla con la API Laravel en el puerto **8000**.
 
-## Scripts
+## Arranque
 
 ```bash
+cp .env.example .env
 npm install
-npm run start
+npm start
 ```
 
-- `npm run start` / `npm run dev`: servidor de desarrollo.
-- `npm run build`: build de produccion.
-- `npm run preview`: previsualizar build local.
-- `npm run test`: pruebas con Vitest.
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000/api
+```
 
-## Rutas implementadas
+Dev: `http://localhost:5173`.
 
-- `/home`
-- `/admin/home`
-- `/admin/movies`
+- `npm start` / `npm run dev`: Vite
+- `npm run build` / `npm run preview`
+- `npm run test`: Vitest
 
-## Configuracion API
+## Rutas
 
-La URL base de backend se define en:
-
-- `src/app/core/config/api.config.ts`
-
-Valor actual:
-
-- `http://127.0.0.1:3001/api`
+- `/home`, `/cartelera`, `/cartelera/:movieId`
+- `/login`, `/register`
+- `/reservar/:sessionId`, `/mis-reservas`, `/perfil` (sesión)
+- `/admin/home`, `/admin/movies`, `/admin/sessions`, `/admin/rooms`, `/admin/users`, `/admin/bookings`, `/admin/prices` (ADMIN)

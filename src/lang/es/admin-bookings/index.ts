@@ -15,6 +15,7 @@ export default {
       sessionStart: 'Inicio sesión',
       createdAt: 'Creado',
       statusId: 'Estado',
+      total: 'Total',
       actions: 'Acciones',
     },
     states: {
@@ -30,6 +31,7 @@ export default {
   },
   modal: {
     titleView: 'Detalle de reserva',
+    titleDelete: 'Eliminar reserva',
     closeAriaLabel: 'Cerrar',
     fields: {
       id: 'ID',
@@ -39,10 +41,26 @@ export default {
       sessionStart: 'Inicio sesión',
       createdAt: 'Creado',
       statusId: 'Estado',
+      total: 'Total',
+      buyerName: 'Comprador',
+      buyerEmail: 'E-mail de la reserva',
+      seats: 'Asientos',
+      tickets: 'Entradas',
     },
     buttons: {
       close: 'Cerrar',
+      cancel: 'Cancelar',
+      cancelBooking: 'Cancelar reserva',
+      restore: 'Volver a confirmar',
+      updating: 'Actualizando...',
+      deleting: 'Eliminando...',
     },
+    confirmCancel: '¿Cancelar esta reserva? Los asientos quedarán libres.',
+    confirmRestore: '¿Volver a confirmar esta reserva?',
+  },
+  status: {
+    confirmed: 'confirmed',
+    cancelled: 'cancelled',
   },
   errors: {
     sessionExpired: 'Sesión caducada o no válida. Inicia sesión de nuevo con un usuario ADMIN.',

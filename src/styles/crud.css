@@ -426,6 +426,21 @@
   gap: 0;
 }
 
+.crud-detail--two-cols {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0 1.75rem;
+}
+
+.crud-detail__col {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 16rem;
+  min-width: 0;
+  margin: 0;
+}
+
 .crud-detail__item {
   display: flex;
   flex-direction: column;
@@ -458,4 +473,15 @@
   font-family: var(--font-brand);
   font-weight: var(--font-weight-heading);
   color: var(--color-text);
+}
+
+.crud-detail__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-body);
 }

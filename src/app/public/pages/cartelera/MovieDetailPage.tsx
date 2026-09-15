@@ -69,6 +69,7 @@ export function MovieDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoadError, setHasLoadError] = useState(false);
   const [showSessions, setShowSessions] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [sessionsError, setSessionsError] = useState(false);
@@ -119,6 +120,7 @@ export function MovieDetailPage() {
 
   useEffect(() => {
     setShowSessions(false);
+    setShowTrailer(false);
     setSessions([]);
     setSelectedDate(null);
     setSelectedSessionId(null);
@@ -278,34 +280,47 @@ export function MovieDetailPage() {
               </dl>
             </div>
 
-            <div className="movie-detail-page__trailer-row">
-              <section className="movie-detail-page__trailer" aria-label={texts.trailer}>
-                {trailerEmbedUrl ? (
-                  <iframe
-                    src={trailerEmbedUrl}
-                    title={`${texts.trailer}: ${display.title}`}
-                    className="movie-detail-page__trailer-embed"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <p className="movie-detail-page__trailer-placeholder">{texts.trailerUnavailable}</p>
-                )}
-              </section>
-
-              <div className="movie-detail-page__actions">
+            <div className="movie-detail-page__actions">
+              {trailerEmbedUrl ? (
                 <button
                   type="button"
-                  className="movie-detail-page__sessions-btn"
-                  onClick={() => setShowSessions(true)}
+                  className="movie-detail-page__sessions-btn movie-detail-page__sessions-btn--ghost"
+                  onClick={() => setShowTrailer(true)}
                 >
-                  {texts.sessions}
+                  {texts.trailerWatch}
                 </button>
-              </div>
+              ) : null}
+              <button
+                type="button"
+                className="movie-detail-page__sessions-btn"
+                onClick={() => setShowSessions(true)}
+              >
+                {texts.sessions}
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      <CrudModal
+        isOpen={showTrailer}
+        title={`${texts.trailer}: ${display.title}`}
+        onClose={() => setShowTrailer(false)}
+        closeAriaLabel={texts.trailerCloseAriaLabel}
+        size="xl"
+      >
+        {trailerEmbedUrl ? (
+          <div className="movie-detail-page__trailer-modal">
+            <iframe
+              src={`${trailerEmbedUrl}?autoplay=1`}
+              title={`${texts.trailer}: ${display.title}`}
+              className="movie-detail-page__trailer-embed"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        ) : null}
+      </CrudModal>
 
       <CrudModal
         isOpen={showSessions}

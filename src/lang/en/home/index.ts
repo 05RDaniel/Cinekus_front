@@ -1,7 +1,10 @@
 export default {
   hero: { title: 'You might like...' },
   loading: { spinnerAriaLabel: 'Loading movies' },
-  alerts: { retryingMessage: 'Movies could not be loaded. Retrying...' },
+  alerts: {
+    retryingMessage: 'Movies could not be loaded. Retrying...',
+    empty: 'There are no movies with upcoming sessions.',
+  },
   card: { imageAlt: 'Featured movie', ratingLabel: 'Rating' },
   meta: {
     name: 'Name',
@@ -14,5 +17,6 @@ export default {
   carousel: {
     prev: 'Previous movie',
     next: 'Next movie',
+    openMovie: 'Open {title}',
   },
 } as const;

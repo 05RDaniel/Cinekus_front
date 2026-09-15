@@ -185,49 +185,12 @@
   word-break: break-word;
 }
 
-.movie-detail-page__trailer-row {
-  display: flex;
-  gap: 1rem;
-  align-items: stretch;
-  min-width: 0;
-}
-
-.movie-detail-page__trailer {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-  min-width: 0;
-  background-color: var(--color-card);
-  border: 1px solid var(--color-border);
-  border-radius: 0.85rem;
-  box-shadow: 0 0.25rem 1rem rgba(30, 30, 30, 0.04);
-}
-
-.movie-detail-page__trailer-embed {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: 0;
-  background-color: #000;
-}
-
-.movie-detail-page__trailer-placeholder {
-  margin: 0;
-  padding: 1.5rem 1rem;
-  text-align: center;
-  color: var(--color-text-secondary);
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-meta);
-  font-size: 0.875rem;
-}
-
 .movie-detail-page__actions {
-  flex: 1 1 0;
   display: flex;
-  align-items: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
+  gap: 0.75rem;
   min-width: 0;
 }
 
@@ -246,12 +209,38 @@
   font-size: 0.95rem;
   cursor: pointer;
   box-shadow: 0 0.35rem 1rem rgba(40, 53, 147, 0.3);
-  transition: transform 0.15s ease, background-color 0.2s ease;
+  transition: transform 0.15s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .movie-detail-page__sessions-btn:hover {
   background-color: var(--color-accent);
   transform: translateY(-1px);
+}
+
+.movie-detail-page__sessions-btn--ghost {
+  background-color: var(--color-card);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  box-shadow: none;
+}
+
+.movie-detail-page__sessions-btn--ghost:hover {
+  background-color: var(--color-primary);
+  color: var(--color-card);
+}
+
+.movie-detail-page__trailer-modal {
+  display: flex;
+  width: 100%;
+}
+
+.movie-detail-page__trailer-embed {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 0.45rem;
+  background-color: #000;
 }
 
 .movie-detail-page__sessions {
@@ -486,10 +475,6 @@
   }
 
   .movie-detail-page__meta {
-    flex-direction: column;
-  }
-
-  .movie-detail-page__trailer-row {
     flex-direction: column;
   }
 

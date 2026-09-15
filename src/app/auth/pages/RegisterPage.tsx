@@ -21,7 +21,9 @@ function firstValidationMessage(error: unknown): string | null {
 }
 
 export function RegisterPage() {
-  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [secondLastName, setSecondLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -39,7 +41,7 @@ export function RegisterPage() {
 
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!username.trim() || !email.trim() || !password || !passwordConfirmation) {
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !passwordConfirmation) {
       setFormError(texts.errors.missingFields);
       return;
     }
@@ -56,7 +58,9 @@ export function RegisterPage() {
     setFormError(null);
     try {
       await register({
-        username: username.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        second_last_name: secondLastName.trim() || undefined,
         email: email.trim(),
         password,
         password_confirmation: passwordConfirmation,
@@ -84,15 +88,38 @@ export function RegisterPage() {
             </div>
           )}
 
-          <label className="login-page__field" htmlFor="register-username">
-            <span>{texts.fields.usernameLabel}</span>
+          <label className="login-page__field" htmlFor="register-first-name">
+            <span>{texts.fields.firstNameLabel}</span>
             <input
-              id="register-username"
+              id="register-first-name"
               type="text"
-              autoComplete="username"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              autoComplete="given-name"
+              value={firstName}
+              onChange={(event) => setFirstName(event.target.value)}
               required
+            />
+          </label>
+
+          <label className="login-page__field" htmlFor="register-last-name">
+            <span>{texts.fields.lastNameLabel}</span>
+            <input
+              id="register-last-name"
+              type="text"
+              autoComplete="family-name"
+              value={lastName}
+              onChange={(event) => setLastName(event.target.value)}
+              required
+            />
+          </label>
+
+          <label className="login-page__field" htmlFor="register-second-last-name">
+            <span>{texts.fields.secondLastNameLabel}</span>
+            <input
+              id="register-second-last-name"
+              type="text"
+              autoComplete="additional-name"
+              value={secondLastName}
+              onChange={(event) => setSecondLastName(event.target.value)}
             />
           </label>
 

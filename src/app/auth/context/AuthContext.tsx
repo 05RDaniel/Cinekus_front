@@ -5,6 +5,7 @@ import {
   getToken,
   login as loginRequest,
   logout as logoutRequest,
+  persistUser,
   register as registerRequest,
   RegisterPayload,
 } from '../services/auth.service';
@@ -14,6 +15,7 @@ type AuthContextValue = {
   token: string | null;
   login: (email: string, password: string) => Promise<LoginResponse>;
   register: (payload: RegisterPayload) => Promise<LoginResponse>;
+  updateUser: (partial: Partial<User>) => void;
   logout: () => void;
   isAuthenticated: boolean;
 };
@@ -40,6 +42,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setUser(response.user);
         setToken(response.token);
         return response;
+      },
+      updateUser: (partial: Partial<User>) => {
+        setUser((prev) => {
+          if (!prev) return prev;
+          const next = { ...prev, ...partial };
+          persistUser(next);
+          return next;
+        });
       },
       logout: () => {
         logoutRequest();

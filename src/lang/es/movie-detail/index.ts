@@ -13,6 +13,8 @@ export default {
   },
   posterAlt: 'Póster de',
   trailer: 'Tráiler',
+  trailerWatch: 'Ver tráiler',
+  trailerCloseAriaLabel: 'Cerrar tráiler',
   trailerUnavailable: 'Tráiler no disponible',
   sessions: 'Ver sesiones',
   sessionsTitle: 'Elige una sesión',
