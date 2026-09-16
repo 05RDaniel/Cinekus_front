@@ -22,7 +22,7 @@ import { ProfilePage } from './public/pages/account/ProfilePage';
 
 export function App() {
   return (
-    <>
+    <div className="app-shell">
       <Header />
       <PageContainer>
         <Routes>
@@ -116,6 +116,6 @@ export function App() {
         </Routes>
       </PageContainer>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -20,6 +20,8 @@ export default {
     rating: 'Valoración',
     from: 'Desde',
     to: 'Hasta',
+    open: 'Filtros',
+    apply: 'Aplicar',
     clear: 'Limpiar filtros',
     results: '{count} películas',
     empty: 'Ninguna película coincide con los filtros.',

@@ -4,8 +4,7 @@
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: clamp(1rem, 2.5vw, 2rem);
-  box-sizing: border-box;
+  padding: var(--space-page);
   overflow-y: auto;
 }
 
@@ -40,15 +39,15 @@
 }
 
 .movie-detail-page__status--error {
-  color: #842029;
-  border-color: #f1aeb5;
-  background-color: #f8d7da;
+  color: var(--color-danger-text);
+  border-color: var(--color-danger-border);
+  background-color: var(--color-danger-bg);
 }
 
 .movie-detail-page__status--auth {
   color: var(--color-text);
   border-color: var(--color-primary);
-  background-color: rgba(40, 53, 147, 0.08);
+  background-color: var(--color-primary-soft);
 }
 
 .movie-detail-page__auth-link {
@@ -461,7 +460,8 @@
 
   .movie-detail-page__aside {
     flex: 0 0 auto;
-    max-width: 18rem;
+    max-width: 20rem;
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -492,5 +492,16 @@
 
   .movie-detail-page__continue-btn {
     width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .movie-detail-page__aside {
+    max-width: 100%;
+  }
+
+  .movie-detail-page__actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

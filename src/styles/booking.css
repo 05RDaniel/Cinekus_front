@@ -4,8 +4,7 @@
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: clamp(1rem, 2.5vw, 2rem);
-  box-sizing: border-box;
+  padding: var(--space-page);
   overflow-y: auto;
 }
 
@@ -13,7 +12,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 72rem;
+  max-width: var(--layout-max);
   margin: 0 auto;
   gap: 1.25rem;
 }
@@ -69,7 +68,7 @@
   height: 1.35rem;
   border-radius: 50%;
   background-color: var(--color-text-secondary);
-  color: #fff;
+  color: var(--color-card);
   font-size: 0.7rem;
   font-weight: var(--font-weight-heading);
 }
@@ -237,7 +236,7 @@
 }
 
 .booking-page__field input:focus {
-  outline: 2px solid rgba(40, 53, 147, 0.25);
+  outline: 2px solid var(--color-primary-ring);
   border-color: var(--color-primary);
 }
 
@@ -260,9 +259,9 @@
 }
 
 .booking-page__status--error {
-  color: #842029;
-  border-color: #f1aeb5;
-  background-color: #f8d7da;
+  color: var(--color-danger-text);
+  border-color: var(--color-danger-border);
+  background-color: var(--color-danger-bg);
 }
 
 .booking-page__layout {
@@ -558,6 +557,29 @@
 
   .booking-page__summary {
     flex: 1 1 auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .booking-page__steps {
+    flex-direction: column;
+  }
+
+  .booking-page__step {
+    width: 100%;
+  }
+
+  .booking-page__map-viewport {
+    min-height: 16rem;
+    height: min(22rem, 50vh);
+  }
+
+  .booking-page__success-actions {
+    flex-direction: column;
+  }
+
+  .booking-page__success-actions .admin-btn {
     width: 100%;
   }
 }

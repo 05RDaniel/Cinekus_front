@@ -114,3 +114,19 @@
   display: flex;
   justify-content: flex-end;
 }
+
+@media (max-width: 560px) {
+  .admin-prices__row input,
+  .admin-prices__add input[type='number'] {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .admin-prices__actions {
+    justify-content: stretch;
+  }
+
+  .admin-prices__actions .admin-btn {
+    width: 100%;
+  }
+}

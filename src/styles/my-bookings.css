@@ -4,8 +4,7 @@
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: clamp(1rem, 2.5vw, 2rem);
-  box-sizing: border-box;
+  padding: var(--space-page);
   overflow-y: auto;
 }
 
@@ -135,4 +134,11 @@
 
 .my-bookings__badge--cancelled {
   background-color: var(--color-text-secondary);
+}
+
+@media (max-width: 560px) {
+  .my-bookings__card-side {
+    align-items: flex-start;
+    width: 100%;
+  }
 }

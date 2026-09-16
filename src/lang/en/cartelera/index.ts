@@ -20,6 +20,8 @@ export default {
     rating: 'Rating',
     from: 'From',
     to: 'To',
+    open: 'Filters',
+    apply: 'Apply',
     clear: 'Clear filters',
     results: '{count} movies',
     empty: 'No movies match the filters.',

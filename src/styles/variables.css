@@ -3,6 +3,9 @@
   --color-primary: #283593;
   --color-secondary: #007f1c;
   --color-accent: #7a4a1b;
+  --color-on-primary: var(--color-card);
+  --color-primary-soft: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  --color-primary-ring: color-mix(in srgb, var(--color-primary) 28%, transparent);
 
   /* Superficies */
   --color-background: #f3f4f6;
@@ -14,6 +17,23 @@
 
   /* Estructura */
   --color-border: #d9dee5;
+
+  /* Feedback */
+  --color-danger: #b42318;
+  --color-danger-hover: #912018;
+  --color-danger-text: #842029;
+  --color-danger-border: #f1aeb5;
+  --color-danger-bg: #f8d7da;
+
+  /* Espacio y forma */
+  --radius-sm: 0.45rem;
+  --radius-md: 0.55rem;
+  --radius-lg: 0.85rem;
+  --space-page: clamp(1rem, 2.5vw, 2rem);
+  --layout-max: 72rem;
+  --header-min-height: 3.75rem;
+  --shadow-card: 0 0.25rem 1rem color-mix(in srgb, var(--color-text) 5%, transparent);
+  --shadow-elevated: 0 0.75rem 1.75rem color-mix(in srgb, var(--color-primary) 16%, transparent);
 
   /* Tipografía */
   --font-brand: 'Manrope', system-ui, sans-serif;
