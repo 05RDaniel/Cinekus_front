@@ -91,11 +91,13 @@ export function HomePage() {
     setCenterIndex((prev) => prev + 1);
   };
 
-  const visibleSlides = [
-    leftMovie ? { movie: leftMovie, position: 'left' as const } : null,
-    featured ? { movie: featured, position: 'center' as const } : null,
-    rightMovie ? { movie: rightMovie, position: 'right' as const } : null,
-  ].filter(Boolean) as { movie: HomeMovie; position: 'left' | 'center' | 'right' }[];
+  const visibleSlides = (
+    [
+      featured ? { movie: featured, position: 'center' as const } : null,
+      leftMovie ? { movie: leftMovie, position: 'left' as const } : null,
+      rightMovie ? { movie: rightMovie, position: 'right' as const } : null,
+    ].filter(Boolean) as { movie: HomeMovie; position: 'left' | 'center' | 'right' }[]
+  ).filter((slide, _index, list) => list.findIndex((item) => item.movie.id === slide.movie.id) === list.indexOf(slide));
 
   return (
     <section className="home-page" aria-label={texts.hero.title}>
@@ -109,7 +111,7 @@ export function HomePage() {
               <span className="home-page__skeleton-line" />
             </div>
           ) : featured ? (
-            <dl className="home-page__meta-list">
+            <dl key={featured.id} className="home-page__meta-list home-page__meta-list--enter">
               <div className="home-page__meta-item">
                 <dt className="text-meta">{texts.meta.name}</dt>
                 <dd>{featured.title}</dd>
@@ -167,7 +169,7 @@ export function HomePage() {
 
                 return (
                   <figure
-                    key={`${movie.id}-${position}`}
+                    key={movie.id}
                     className={`home-page__slide home-page__slide--${position}`}
                   >
                     {position === 'center' ? (
@@ -217,7 +219,9 @@ export function HomePage() {
               <span className="home-page__skeleton-block home-page__skeleton-block--short" />
             </div>
           ) : (
-            <p className="home-page__synopsis-text">{featured?.overview || '—'}</p>
+            <p key={featured?.id ?? 'empty'} className="home-page__synopsis-text home-page__synopsis-text--enter">
+              {featured?.overview || '—'}
+            </p>
           )}
         </aside>
       </div>

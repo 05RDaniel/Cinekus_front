@@ -142,16 +142,13 @@
 }
 
 .admin-home-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
-  align-content: flex-start;
 }
 
 .admin-home-card {
-  flex: 1 1 14rem;
-  min-width: 12rem;
-  max-width: calc(33.333% - 0.85rem);
+  min-width: 0;
   display: flex;
   min-height: 8.5rem;
   text-decoration: none;
@@ -315,8 +312,8 @@
 }
 
 @media (max-width: 900px) {
-  .admin-home-card {
-    max-width: calc(50% - 0.65rem);
+  .admin-home-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .admin-filters {
@@ -339,8 +336,8 @@
     justify-content: flex-start;
   }
 
-  .admin-home-card {
-    max-width: 100%;
+  .admin-home-grid {
+    grid-template-columns: 1fr;
   }
 
   .admin-table__actions {
