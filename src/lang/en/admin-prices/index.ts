@@ -12,9 +12,9 @@ export default {
   confirmDeleteSeat: 'Delete this seat type?',
   deleted: 'Type deleted.',
   price: 'Price',
+  mode: 'Mode',
   tickets: {
     title: 'Ticket types',
-    hint: 'Base price for each ticket.',
     namePlaceholder: 'New ticket type',
     adult: 'Adult',
     child: 'Child',
@@ -22,7 +22,6 @@ export default {
   },
   seats: {
     title: 'Seat types',
-    hint: 'Amount added on top of the ticket. Regular is usually 0.',
     namePlaceholder: 'New seat type',
     standard: 'Regular',
     vip: 'VIP',
@@ -32,7 +31,7 @@ export default {
     sessionExpired: 'Session expired or invalid. Sign in again with an ADMIN user.',
     forbidden: 'You do not have permission (ADMIN role required).',
     generic: 'Prices could not be saved.',
-    invalidPrice: 'Enter a valid price (0 or more).',
+    invalidPrice: 'Enter a valid number.',
     missingName: 'Enter a name for the type.',
     lastTicket: 'At least one ticket type must remain.',
     lastSeat: 'At least one seat type must remain.',

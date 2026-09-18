@@ -64,3 +64,36 @@ export function formatSessionSchedule(
   const formattedTime = formatSessionTime(time);
   return formattedTime ? `${date} ${formattedTime}` : date;
 }
+
+const DEFAULT_SESSION_DURATION_MIN = 120;
+
+function minutesFromSessionTime(time: string): number {
+  const [hours, minutes] = formatSessionTime(time).split(':').map(Number);
+  return (hours || 0) * 60 + (minutes || 0);
+}
+
+function sessionDurationMinutes(movies: { id: number; duration: number }[], movieId: number): number {
+  const duration = movies.find((movie) => movie.id === movieId)?.duration;
+  return duration && duration > 0 ? duration : DEFAULT_SESSION_DURATION_MIN;
+}
+
+export function roomIsOccupied(
+  sessions: Session[],
+  movies: { id: number; duration: number }[],
+  roomId: number,
+  startDate: string,
+  startTime: string,
+  movieId: number,
+  ignoreSessionId?: number | null
+): boolean {
+  const newStart = minutesFromSessionTime(startTime);
+  const newEnd = newStart + Math.max(1, sessionDurationMinutes(movies, movieId));
+
+  return sessions.some((session) => {
+    if (session.room_id !== roomId || session.start_date !== startDate) return false;
+    if (ignoreSessionId && session.id === ignoreSessionId) return false;
+    const existingStart = minutesFromSessionTime(session.start_time);
+    const existingEnd = existingStart + Math.max(1, sessionDurationMinutes(movies, session.movie_id));
+    return newStart < existingEnd && existingStart < newEnd;
+  });
+}

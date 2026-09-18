@@ -1,4 +1,4 @@
-import { FormEvent, useCallback } from 'react';
+import { FormEvent, useCallback, useState } from 'react';
 import { Movie } from '../../../../features/movies/models/movie.model';
 import { getMovies } from '../../../../features/movies/services/movies.service';
 import { Room } from '../../../../features/rooms/models/room.model';
@@ -8,7 +8,7 @@ import {
   PRIMARY_SESSION_LANGUAGE_CODE,
   Session,
   formatSessionTime,
-  sessionTypeLabel,
+  roomIsOccupied,
 } from '../../../../features/screenings/models/screening.model';
 import {
   createSession,
@@ -17,18 +17,20 @@ import {
   getSessions,
   updateSession,
 } from '../../../../features/screenings/services/screenings.service';
-import { AdminTableStates } from '../../../../shared/components/crud/AdminTableStates';
+import { ConfirmModal } from '../../../../shared/components/crud/ConfirmModal';
 import { CrudModal } from '../../../../shared/components/crud/CrudModal';
 import { AdminPageHeader } from '../../../../shared/components/layout/AdminPageHeader';
 import { useCrudModal } from '../../../../shared/hooks/useCrudModal';
 import { useInitialLoad } from '../../../../shared/hooks/useInitialLoad';
 import { mapApiError } from '../../../../shared/utils/mapApiError';
 import { usePageTexts } from '../../../../../lang';
+import { useLanguage } from '../../../../core/context/LanguageContext';
 import {
   AdminSessionForm,
   createEmptySessionForm,
   SessionFormValues,
 } from './AdminSessionForm';
+import { AdminSessionsWeekGrid } from './AdminSessionsWeekGrid';
 
 type SessionsPageData = {
   sessions: Session[];
@@ -41,6 +43,10 @@ const emptyData: SessionsPageData = { sessions: [], movies: [], rooms: [], langu
 
 export function AdminSessionsPage() {
   const texts = usePageTexts('admin-sessions');
+  const { language } = useLanguage();
+  const [pendingDelete, setPendingDelete] = useState<Session | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [moveError, setMoveError] = useState<string | null>(null);
   const loadData = useCallback(async () => {
     const [sessions, movies, rooms, languages] = await Promise.all([
       getSessions(),
@@ -68,18 +74,14 @@ export function AdminSessionsPage() {
   } = useCrudModal<SessionFormValues>(createEmptySessionForm([]));
 
   const errorMessages = texts.modal.errors;
-  const subtitleLabels = texts.table.subtitles;
 
-  const formatSubtitles = (session: Session) => {
-    if (session.language_code === PRIMARY_SESSION_LANGUAGE_CODE || !session.subtitles) {
-      return '—';
-    }
-    if (session.subtitles === 'none') return subtitleLabels.none;
-    if (session.subtitles === 'es') return subtitleLabels.es;
-    return subtitleLabels.en;
-  };
-
-  const openCreateModal = () => openCreate(createEmptySessionForm(rows.languages));
+  const openCreateModal = (startDate = '', startTime = '', roomId = '') =>
+    openCreate({
+      ...createEmptySessionForm(rows.languages),
+      start_date: startDate,
+      start_time: startTime,
+      room_id: roomId,
+    });
 
   const openEditModal = (session: Session) =>
     openEdit(session.id, {
@@ -133,6 +135,20 @@ export function AdminSessionsPage() {
       setFormError(errorMessages.missingSubtitles);
       return;
     }
+    if (
+      roomIsOccupied(
+        rows.sessions,
+        rows.movies,
+        roomId,
+        formValues.start_date,
+        formValues.start_time,
+        movieId,
+        editingId
+      )
+    ) {
+      setFormError(errorMessages.roomOccupied);
+      return;
+    }
 
     setIsSaving(true);
     setFormError(null);
@@ -154,80 +170,86 @@ export function AdminSessionsPage() {
     }
   };
 
-  const onDelete = async (session: Session) => {
-    if (!window.confirm(texts.table.confirmDelete)) return;
+  const closeDeleteConfirm = () => {
+    if (isDeleting) return;
+    setPendingDelete(null);
+  };
+
+  const onDelete = (session: Session) => {
+    setPendingDelete(session);
+  };
+
+  const onMoveSession = async (session: Session, date: string, time: string, roomId: number) => {
+    if (
+      session.room_id === roomId &&
+      session.start_date === date &&
+      formatSessionTime(session.start_time) === time
+    ) {
+      return;
+    }
+    if (roomIsOccupied(rows.sessions, rows.movies, roomId, date, time, session.movie_id, session.id)) {
+      setMoveError(errorMessages.roomOccupied);
+      return;
+    }
+    setMoveError(null);
     try {
-      await deleteSession(session.id);
+      await updateSession(session.id, {
+        room_id: roomId,
+        start_date: date,
+        start_time: time,
+      });
+      await reload();
+    } catch (error) {
+      setMoveError(mapApiError(error, errorMessages));
+    }
+  };
+
+  const onConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteSession(pendingDelete.id);
+      setPendingDelete(null);
       await reload();
     } catch {
       setHasLoadError(true);
+      setPendingDelete(null);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   return (
-    <section className="admin-page">
+    <section className="admin-page admin-page--sessions">
       <div className="admin-page__inner">
         <AdminPageHeader
           backTo="/admin/home"
           title={texts.title}
           action={
-            <button type="button" className="admin-btn" onClick={openCreateModal}>
+            <button type="button" className="admin-btn" onClick={() => openCreateModal()}>
               {texts.addButton}
             </button>
           }
         />
 
-        <div className="admin-table-panel">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{texts.table.columns.id}</th>
-                <th>{texts.table.columns.movie}</th>
-                <th>{texts.table.columns.room}</th>
-                <th>{texts.table.columns.language}</th>
-                <th>{texts.table.columns.type}</th>
-                <th>{texts.table.columns.subtitles}</th>
-                <th>{texts.table.columns.startDate}</th>
-                <th>{texts.table.columns.startTime}</th>
-                <th>{texts.table.columns.actions}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <AdminTableStates
-                colSpan={9}
-                isLoading={isLoading}
-                hasLoadError={hasLoadError}
-                isEmpty={rows.sessions.length === 0}
-                loadingText={texts.table.states.loading}
-                errorText={texts.table.states.loadError}
-                emptyText={texts.table.states.empty}
-              >
-                {rows.sessions.map((row) => (
-                  <tr key={row.id}>
-                    <td>{row.id}</td>
-                    <td>{row.movie_title ?? row.movie_id}</td>
-                    <td>{row.room_name ?? row.room_id}</td>
-                    <td>{row.language_name ?? row.language_code ?? row.language_id}</td>
-                    <td>{sessionTypeLabel(row.session_type, texts.table.types)}</td>
-                    <td>{formatSubtitles(row)}</td>
-                    <td>{row.start_date}</td>
-                    <td>{formatSessionTime(row.start_time)}</td>
-                    <td>
-                      <div className="admin-table__actions">
-                        <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => openEditModal(row)}>
-                          {texts.table.actions.edit}
-                        </button>
-                        <button type="button" className="admin-btn admin-btn--danger admin-btn--sm" onClick={() => void onDelete(row)}>
-                          {texts.table.actions.delete}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </AdminTableStates>
-            </tbody>
-          </table>
-        </div>
+        {moveError ? <div className="admin-alert admin-alert--error">{moveError}</div> : null}
+
+        <AdminSessionsWeekGrid
+          sessions={rows.sessions}
+          movies={rows.movies}
+          rooms={rows.rooms}
+          locale={language}
+          isLoading={isLoading}
+          hasLoadError={hasLoadError}
+          labels={{
+            ...texts.week,
+            types: texts.table.types,
+          }}
+          onCreateAt={(date, time, roomId) => openCreateModal(date, time, String(roomId))}
+          onMove={(session, date, time, roomId) => void onMoveSession(session, date, time, roomId)}
+          onEdit={openEditModal}
+          onDelete={onDelete}
+        />
 
         <CrudModal
           isOpen={isModalOpen}
@@ -252,6 +274,19 @@ export function AdminSessionsPage() {
             labels={texts.modal.fields}
           />
         </CrudModal>
+
+        <ConfirmModal
+          isOpen={pendingDelete != null}
+          title={texts.modal.titleDelete}
+          message={texts.table.confirmDelete}
+          confirmLabel={texts.table.actions.delete}
+          cancelLabel={texts.modal.buttons.cancel}
+          closeAriaLabel={texts.modal.closeAriaLabel}
+          confirmingLabel={texts.modal.buttons.deleting}
+          isConfirming={isDeleting}
+          onCancel={closeDeleteConfirm}
+          onConfirm={() => void onConfirmDelete()}
+        />
       </div>
     </section>
   );

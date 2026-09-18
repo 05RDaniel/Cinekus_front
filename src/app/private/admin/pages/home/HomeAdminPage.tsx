@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { AdminHomeCardIcon } from '../../../../shared/components/icons/AdminHomeCardIcon';
+import { CardCornerIcon } from '../../../../shared/components/icons/CardCornerIcon';
 import { AdminPageHeader } from '../../../../shared/components/layout/AdminPageHeader';
 import { usePageTexts } from '../../../../../lang';
+
+const CARD_CORNERS = ['tl', 'tr', 'br', 'bl'] as const;
 
 export function HomeAdminPage() {
   const texts = usePageTexts('admin-home');
@@ -24,6 +27,15 @@ export function HomeAdminPage() {
           {cards.map((card) => (
             <Link key={card.route} to={card.route} className="admin-home-card">
               <div className="admin-home-card__inner">
+                {CARD_CORNERS.map((corner) => (
+                  <span
+                    key={corner}
+                    className={`admin-home-card__corner admin-home-card__corner--${corner}`}
+                    aria-hidden="true"
+                  >
+                    <CardCornerIcon />
+                  </span>
+                ))}
                 <span className="admin-home-card__icon">
                   <AdminHomeCardIcon name={card.icon} />
                 </span>

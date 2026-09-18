@@ -188,7 +188,10 @@ export function CarteleraPage() {
       const { title, sinopsis } = getMovieDisplay(movie, language);
       const needle = query.trim().toLowerCase();
       if (needle) {
-        const haystack = [title, sinopsis, movie.title].join(' ').toLowerCase();
+        const credits = movie.cast
+          .filter((person) => person.department === 'acting' || person.department === 'directing')
+          .map((person) => person.name);
+        const haystack = [title, sinopsis, movie.title, ...credits].join(' ').toLowerCase();
         if (!haystack.includes(needle)) return false;
       }
 
@@ -345,7 +348,9 @@ export function CarteleraPage() {
               {filtersOpen && (
                 <div
                   id="cartelera-filters-panel"
-                  className="cartelera-filters__panel"
+                  className={`cartelera-filters__panel${
+                    genreMenuOpen ? ' cartelera-filters__panel--menu-open' : ''
+                  }`}
                   role="dialog"
                   aria-label={texts.filters.open}
                 >

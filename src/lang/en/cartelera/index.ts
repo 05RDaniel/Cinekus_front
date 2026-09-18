@@ -11,7 +11,7 @@ export default {
   },
   filters: {
     search: 'Search',
-    searchPlaceholder: 'Title or synopsis',
+    searchPlaceholder: 'Title, synopsis, actor or director',
     genres: 'Genres',
     genresPlaceholder: 'Select genres',
     removeGenre: 'Remove {name}',

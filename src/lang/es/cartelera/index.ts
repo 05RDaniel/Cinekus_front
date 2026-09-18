@@ -11,7 +11,7 @@ export default {
   },
   filters: {
     search: 'Buscar',
-    searchPlaceholder: 'Título o sinopsis',
+    searchPlaceholder: 'Título, sinopsis, actor o director',
     genres: 'Géneros',
     genresPlaceholder: 'Seleccionar géneros',
     removeGenre: 'Quitar {name}',

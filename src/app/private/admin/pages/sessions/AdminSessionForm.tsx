@@ -10,6 +10,7 @@ import {
 } from '../../../../features/screenings/models/screening.model';
 import { Movie } from '../../../../features/movies/models/movie.model';
 import { Room } from '../../../../features/rooms/models/room.model';
+import { CrudSelect } from '../../../../shared/components/crud/CrudSelect';
 
 export type SessionFormValues = {
   movie_id: string;
@@ -31,7 +32,10 @@ type AdminSessionFormProps = {
     movie: string;
     movieSearchHelp: string;
     movieNoResults: string;
+    duration: string;
+    durationSuffix: string;
     room: string;
+    totalSeats: string;
     language: string;
     sessionType: string;
     subtitles: string;
@@ -40,15 +44,36 @@ type AdminSessionFormProps = {
     subtitlesEn: string;
     startDate: string;
     startTime: string;
+    endTime: string;
+    emptyReadonly: string;
     type2d: string;
     type3d: string;
     type4d: string;
   };
 };
 
+function subtitleOptionLabel(
+  option: SessionSubtitles,
+  labels: Pick<AdminSessionFormProps['labels'], 'subtitlesNone' | 'subtitlesEs' | 'subtitlesEn'>
+): string {
+  if (option === 'none') return labels.subtitlesNone;
+  if (option === 'es') return labels.subtitlesEs;
+  return labels.subtitlesEn;
+}
+
 function isPrimaryLanguage(languages: CinemaLanguage[], languageId: string): boolean {
   const language = languages.find((item) => String(item.id) === languageId);
   return language?.code === PRIMARY_SESSION_LANGUAGE_CODE;
+}
+
+function endTimeFromStart(startTime: string, durationMinutes: number): string {
+  if (!startTime || durationMinutes <= 0) return '';
+  const [hours, minutes] = startTime.slice(0, 5).split(':').map(Number);
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return '';
+  const total = hours * 60 + minutes + durationMinutes;
+  const endHours = Math.floor(total / 60) % 24;
+  const endMinutes = total % 60;
+  return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
 }
 
 export function AdminSessionForm({
@@ -68,6 +93,20 @@ export function AdminSessionForm({
     () => movies.find((movie) => String(movie.id) === values.movie_id),
     [movies, values.movie_id]
   );
+
+  const selectedRoom = useMemo(
+    () => rooms.find((room) => String(room.id) === values.room_id),
+    [rooms, values.room_id]
+  );
+
+  const movieDuration = selectedMovie?.duration && selectedMovie.duration > 0 ? selectedMovie.duration : null;
+  const durationDisplay = movieDuration !== null ? `${movieDuration} ${labels.durationSuffix}` : labels.emptyReadonly;
+  const seatCount = selectedRoom?.seat_count ?? null;
+  const seatsDisplay = seatCount !== null ? String(seatCount) : labels.emptyReadonly;
+  const endTimeDisplay =
+    movieDuration !== null && values.start_time
+      ? endTimeFromStart(values.start_time, movieDuration)
+      : labels.emptyReadonly;
 
   const movieSuggestions = useMemo(() => {
     const query = movieQuery.trim().toLowerCase();
@@ -119,125 +158,118 @@ export function AdminSessionForm({
 
   return (
     <div className="crud-form">
-      <div className="crud-field">
-        <label className="crud-field__label" htmlFor="session-movie">
-          {labels.movie}
-        </label>
-        <div className="crud-suggest" ref={movieContainerRef}>
-          <input
-            id="session-movie"
-            value={movieQuery}
-            onChange={(event) => onMovieQueryChange(event.target.value)}
-            onFocus={() => setShowMovieSuggestions(true)}
-            autoComplete="off"
-            placeholder={labels.movieSearchHelp}
-          />
-          {showMovieSuggestions && (
-            <div className="crud-suggest__list" role="listbox">
-              {movieSuggestions.length === 0 ? (
-                <div className="crud-suggest__empty">{labels.movieNoResults}</div>
-              ) : (
-                movieSuggestions.map((movie) => (
-                  <button
-                    key={movie.id}
-                    type="button"
-                    className="crud-suggest__option"
-                    onClick={() => onSelectMovie(movie)}
-                  >
-                    {movie.image ? (
-                      <img src={movie.image} alt="" className="crud-suggest__thumb" width={36} height={54} />
-                    ) : (
-                      <div className="crud-suggest__thumb crud-suggest__thumb--empty" aria-hidden="true" />
-                    )}
-                    <span className="crud-suggest__title">{movie.title}</span>
-                  </button>
-                ))
-              )}
-            </div>
-          )}
+      <div className="crud-form__row">
+        <div className="crud-field crud-field--wide">
+          <label className="crud-field__label" htmlFor="session-movie">
+            {labels.movie}
+          </label>
+          <div className="crud-suggest" ref={movieContainerRef}>
+            <input
+              id="session-movie"
+              value={movieQuery}
+              onChange={(event) => onMovieQueryChange(event.target.value)}
+              onFocus={() => setShowMovieSuggestions(true)}
+              autoComplete="off"
+              placeholder={labels.movieSearchHelp}
+            />
+            {showMovieSuggestions && (
+              <div className="crud-suggest__list" role="listbox">
+                {movieSuggestions.length === 0 ? (
+                  <div className="crud-suggest__empty">{labels.movieNoResults}</div>
+                ) : (
+                  movieSuggestions.map((movie) => (
+                    <button
+                      key={movie.id}
+                      type="button"
+                      className="crud-suggest__option"
+                      onClick={() => onSelectMovie(movie)}
+                    >
+                      {movie.image ? (
+                        <img src={movie.image} alt="" className="crud-suggest__thumb" width={36} height={54} />
+                      ) : (
+                        <div className="crud-suggest__thumb crud-suggest__thumb--empty" aria-hidden="true" />
+                      )}
+                      <span className="crud-suggest__title">{movie.title}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="crud-field crud-field--compact">
+          <span className="crud-field__label">{labels.duration}</span>
+          <div className="crud-field__control crud-field__control--readonly">{durationDisplay}</div>
         </div>
       </div>
 
       <div className="crud-form__row">
-        <div className="crud-field">
+        <div className="crud-field crud-field--wide">
           <label className="crud-field__label" htmlFor="session-room">
             {labels.room}
           </label>
-          <select
+          <CrudSelect
             id="session-room"
             value={values.room_id}
-            onChange={(event) => onChange({ ...values, room_id: event.target.value })}
-            required
-          >
-            <option value="">{labels.room}</option>
-            {rooms.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
+            placeholder={labels.room}
+            options={rooms.map((room) => ({ value: String(room.id), label: room.name }))}
+            onChange={(room_id) => onChange({ ...values, room_id })}
+          />
         </div>
+        <div className="crud-field crud-field--compact">
+          <span className="crud-field__label">{labels.totalSeats}</span>
+          <div className="crud-field__control crud-field__control--readonly">{seatsDisplay}</div>
+        </div>
+      </div>
+
+      <div className="crud-form__row">
         <div className="crud-field">
           <label className="crud-field__label" htmlFor="session-language">
             {labels.language}
           </label>
-          <select
+          <CrudSelect
             id="session-language"
             value={values.language_id}
-            onChange={(event) => onLanguageChange(event.target.value)}
-            required
-          >
-            <option value="">{labels.language}</option>
-            {languages.map((language) => (
-              <option key={language.id} value={language.id}>
-                {language.name}
-              </option>
-            ))}
-          </select>
+            placeholder={labels.language}
+            options={languages.map((language) => ({
+              value: String(language.id),
+              label: language.name,
+            }))}
+            onChange={onLanguageChange}
+          />
         </div>
-      </div>
-
-      <div className="crud-form__row">
         <div className="crud-field">
           <label className="crud-field__label" htmlFor="session-type">
             {labels.sessionType}
           </label>
-          <select
+          <CrudSelect
             id="session-type"
             value={values.session_type}
-            onChange={(event) => onChange({ ...values, session_type: event.target.value as SessionType })}
-            required
-          >
-            {SESSION_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {sessionTypeLabel(type, labels)}
-              </option>
-            ))}
-          </select>
+            options={SESSION_TYPES.map((type) => ({
+              value: type,
+              label: sessionTypeLabel(type, labels),
+            }))}
+            onChange={(session_type) =>
+              onChange({ ...values, session_type: session_type as SessionType })
+            }
+          />
         </div>
         {showSubtitles && (
           <div className="crud-field">
             <label className="crud-field__label" htmlFor="session-subtitles">
               {labels.subtitles}
             </label>
-            <select
+            <CrudSelect
               id="session-subtitles"
               value={values.subtitles}
-              onChange={(event) =>
-                onChange({ ...values, subtitles: event.target.value as SessionSubtitles })
+              options={SESSION_SUBTITLE_OPTIONS.map((option) => ({
+                value: option,
+                label: subtitleOptionLabel(option, labels),
+              }))}
+              onChange={(subtitles) =>
+                onChange({ ...values, subtitles: subtitles as SessionSubtitles })
               }
-              required
-            >
-              {SESSION_SUBTITLE_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option === 'none'
-                    ? labels.subtitlesNone
-                    : option === 'es'
-                      ? labels.subtitlesEs
-                      : labels.subtitlesEn}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         )}
       </div>
@@ -266,6 +298,10 @@ export function AdminSessionForm({
             onChange={(event) => onChange({ ...values, start_time: event.target.value })}
             required
           />
+        </div>
+        <div className="crud-field crud-field--compact">
+          <span className="crud-field__label">{labels.endTime}</span>
+          <div className="crud-field__control crud-field__control--readonly">{endTimeDisplay}</div>
         </div>
       </div>
     </div>

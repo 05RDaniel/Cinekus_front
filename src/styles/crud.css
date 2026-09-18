@@ -130,6 +130,10 @@
   padding: 1.25rem;
 }
 
+.crud-modal__body:has(.crud-select--open) {
+  overflow: visible;
+}
+
 .crud-modal__footer {
   display: flex;
   flex-wrap: wrap;
@@ -170,6 +174,14 @@
   min-width: 0;
 }
 
+.crud-form__row > .crud-field--wide {
+  flex: 2 1 16rem;
+}
+
+.crud-form__row > .crud-field--compact {
+  flex: 0 1 9.5rem;
+}
+
 .crud-field {
   display: flex;
   flex-direction: column;
@@ -193,7 +205,8 @@
 .crud-field__control,
 .crud-field input:not([type='checkbox']):not([type='radio']),
 .crud-field select,
-.crud-field textarea {
+.crud-field textarea,
+.crud-select__btn {
   width: 100%;
   box-sizing: border-box;
   padding: 0.55rem 0.7rem;
@@ -207,9 +220,19 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.crud-field input:not([type='checkbox']):not([type='radio']):focus,
+.crud-field input:not([type='checkbox']):not([type='radio']):read-only,
+.crud-field input:not([type='checkbox']):not([type='radio']):disabled,
+.crud-field__control--readonly {
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+  cursor: default;
+  box-shadow: none;
+}
+
+.crud-field input:not([type='checkbox']):not([type='radio']):not([readonly]):focus,
 .crud-field select:focus,
-.crud-field textarea:focus {
+.crud-field textarea:focus,
+.crud-select__btn:focus-visible {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 0.2rem rgba(40, 53, 147, 0.15);
@@ -218,6 +241,77 @@
 .crud-field textarea {
   resize: vertical;
   min-height: 6rem;
+}
+
+.crud-select {
+  position: relative;
+  z-index: 1;
+}
+
+.crud-select--open {
+  z-index: 8;
+}
+
+.crud-select__btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  cursor: pointer;
+}
+
+.crud-select__btn--placeholder {
+  color: var(--color-text-secondary);
+}
+
+.crud-select__btn::after {
+  content: '';
+  flex-shrink: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-left: 0.5rem;
+  border-right: 2px solid var(--color-text-secondary);
+  border-bottom: 2px solid var(--color-text-secondary);
+  transform: rotate(45deg) translateY(-0.15rem);
+}
+
+.crud-select--open .crud-select__btn::after {
+  transform: rotate(225deg) translateY(-0.15rem);
+}
+
+.crud-select__menu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 15rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.55rem;
+  box-shadow: 0 0.5rem 1.25rem rgba(30, 30, 30, 0.12);
+}
+
+.crud-select__option {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.925rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.crud-select__option:hover,
+.crud-select__option--selected {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-card));
 }
 
 .crud-field--checkbox {

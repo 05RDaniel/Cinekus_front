@@ -181,13 +181,12 @@ export function AdminMoviesPage() {
                 <th>{texts.table.columns.synopsis}</th>
                 <th>{texts.table.columns.duration}</th>
                 <th>{texts.table.columns.rating}</th>
-                <th>{texts.table.columns.trailer}</th>
                 <th>{texts.table.columns.actions}</th>
               </tr>
             </thead>
             <tbody>
               <AdminTableStates
-                colSpan={8}
+                colSpan={7}
                 isLoading={isLoading}
                 hasLoadError={hasLoadError}
                 isEmpty={rows.length === 0}
@@ -197,7 +196,7 @@ export function AdminMoviesPage() {
               >
                 {rows.map((row) => (
                   <tr key={row.id}>
-                    <td>
+                    <td className="admin-table__poster">
                       {row.image ? (
                         <img
                           src={row.image}
@@ -208,24 +207,18 @@ export function AdminMoviesPage() {
                           }}
                         />
                       ) : (
-                        <span>—</span>
+                        <div className="admin-table__thumb" aria-hidden="true" />
                       )}
                     </td>
                     <td>{row.title}</td>
                     <td>{row.release_year ?? '—'}</td>
-                    <td>{row.sinopsis}</td>
+                    <td>
+                      <p className="admin-table__synopsis">{row.sinopsis || '—'}</p>
+                    </td>
                     <td>
                       {row.duration} {texts.durationSuffix}
                     </td>
                     <td>{row.rating ?? '-'}</td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(row.trailer_url)}
-                        disabled
-                        aria-label={texts.table.trailerAriaLabel}
-                      />
-                    </td>
                     <td>
                       <div className="admin-table__actions">
                         <button type="button" className="admin-btn admin-btn--ghost admin-btn--sm" onClick={() => openEditModal(row)}>

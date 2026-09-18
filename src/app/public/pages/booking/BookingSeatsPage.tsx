@@ -4,13 +4,17 @@ import { useAuth } from '../../../auth/context/AuthContext';
 import { createBooking } from '../../../features/bookings/services/bookings.service';
 import { getSeatTypePrices, getTicketTypes } from '../../../features/bookings/services/prices.service';
 import {
+  bookingTotal,
   emptyTicketSelection,
   formatPrice,
+  formatPriceModifier,
+  normalizePriceMode,
   seatsSurcharge,
   SeatTypePrice,
   TicketSelection,
   TicketType,
   ticketsSubtotal,
+  ticketUnitPrice,
   totalTickets,
 } from '../../../features/bookings/models/ticket.model';
 import { Session, formatSessionSchedule, sessionTypeLabel } from '../../../features/screenings/models/screening.model';
@@ -74,9 +78,11 @@ export function BookingSeatsPage() {
   const ticketsAmount = ticketsSubtotal(ticketSelection, ticketTypes);
   const seatsAmount = seatsSurcharge(
     seats.filter((seat) => selectedIds.includes(seat.id)).map((seat) => seat.seat_type_id),
-    seatTypePrices
+    seatTypePrices,
+    ticketsAmount,
+    ticketCount
   );
-  const priceTotal = ticketsAmount + seatsAmount;
+  const priceTotal = bookingTotal(ticketsAmount, seatsAmount);
 
   const loadData = async () => {
     if (!Number.isFinite(parsedSessionId)) {
@@ -450,7 +456,10 @@ export function BookingSeatsPage() {
                           <div className="booking-page__ticket-info">
                             <span className="booking-page__ticket-name">{ticketLabel(type)}</span>
                             <span className="booking-page__ticket-price">
-                              {formatPrice(type.price, language)}
+                              {formatPrice(ticketUnitPrice(type, ticketTypes), language)}
+                              {normalizePriceMode(type.price_mode) === 'percent'
+                                ? ` (${formatPriceModifier(Number(type.price), 'percent', language)})`
+                                : ''}
                             </span>
                           </div>
                           <div className="booking-page__ticket-qty" aria-label={texts.tickets.quantity}>
@@ -836,7 +845,7 @@ export function BookingSeatsPage() {
                       {selectedCodes.length > 0
                         ? `${selectedCodes.join(', ')} (${selectedCodes.length}/${ticketCount || '—'})`
                         : texts.summary.none}
-                      {seatsAmount > 0 ? (
+                      {seatsAmount !== 0 ? (
                         <span className="booking-page__summary-price">
                           {texts.summary.seatSurcharge}: {formatPrice(seatsAmount, language)}
                         </span>

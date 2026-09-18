@@ -1,10 +1,11 @@
 import { API_ENDPOINTS } from '../../../core/config/api.config';
 import { http } from '../../../core/http/http';
-import { SeatTypePrice, TicketType } from '../models/ticket.model';
+import { normalizePriceMode, PriceMode, SeatTypePrice, TicketType } from '../models/ticket.model';
 
 export type PriceUpdateItem = {
   id: number;
   price: number;
+  price_mode: PriceMode;
 };
 
 export type PricesPayload = {
@@ -18,11 +19,21 @@ export type UpdatePricesPayload = {
 };
 
 function normalizeTicket(type: TicketType): TicketType {
-  return { ...type, name: type.name || type.code, price: Number(type.price) };
+  return {
+    ...type,
+    name: type.name || type.code,
+    price: Number(type.price),
+    price_mode: normalizePriceMode(type.price_mode),
+  };
 }
 
 function normalizeSeat(type: SeatTypePrice): SeatTypePrice {
-  return { ...type, label: type.label || type.name, price: Number(type.price) };
+  return {
+    ...type,
+    label: type.label || type.name,
+    price: Number(type.price),
+    price_mode: normalizePriceMode(type.price_mode),
+  };
 }
 
 export async function getTicketTypes(): Promise<TicketType[]> {
@@ -52,12 +63,20 @@ export async function updateAdminPrices(payload: UpdatePricesPayload): Promise<P
   return normalizePrices(data);
 }
 
-export async function createTicketType(payload: { name: string; price: number }): Promise<TicketType> {
+export async function createTicketType(payload: {
+  name: string;
+  price: number;
+  price_mode: PriceMode;
+}): Promise<TicketType> {
   const { data } = await http.post<TicketType>(`${API_ENDPOINTS.cine}/tipos-entrada`, payload);
   return normalizeTicket(data);
 }
 
-export async function createSeatType(payload: { name: string; price: number }): Promise<SeatTypePrice> {
+export async function createSeatType(payload: {
+  name: string;
+  price: number;
+  price_mode: PriceMode;
+}): Promise<SeatTypePrice> {
   const { data } = await http.post<SeatTypePrice>(`${API_ENDPOINTS.cine}/tipos-asiento`, payload);
   return normalizeSeat(data);
 }

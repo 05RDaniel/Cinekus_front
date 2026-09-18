@@ -107,6 +107,10 @@
   box-shadow: var(--shadow-elevated);
 }
 
+.cartelera-filters__panel--menu-open {
+  overflow: visible;
+}
+
 .cartelera-filters__genres {
   display: flex;
   flex-direction: column;
@@ -139,6 +143,7 @@
 
 .cartelera-filters__select {
   position: relative;
+  z-index: 2;
 }
 
 .cartelera-filters__select-btn {

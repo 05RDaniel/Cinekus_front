@@ -12,9 +12,9 @@ export default {
   confirmDeleteSeat: '¿Eliminar este tipo de asiento?',
   deleted: 'Tipo eliminado.',
   price: 'Precio',
+  mode: 'Modalidad',
   tickets: {
     title: 'Tipos de entrada',
-    hint: 'Precio base de cada entrada.',
     namePlaceholder: 'Nuevo tipo de entrada',
     adult: 'Adulto',
     child: 'Niño',
@@ -22,7 +22,6 @@ export default {
   },
   seats: {
     title: 'Tipos de asiento',
-    hint: 'Suplemento que se suma a la entrada. Regular suele ser 0.',
     namePlaceholder: 'Nuevo tipo de asiento',
     standard: 'Regular',
     vip: 'VIP',
@@ -32,7 +31,7 @@ export default {
     sessionExpired: 'Sesión caducada o no válida. Inicia sesión de nuevo con un usuario ADMIN.',
     forbidden: 'No tienes permiso (se requiere rol ADMIN).',
     generic: 'No se pudieron guardar los precios.',
-    invalidPrice: 'Introduce un precio válido (0 o más).',
+    invalidPrice: 'Introduce un valor numérico válido.',
     missingName: 'Introduce un nombre para el tipo.',
     lastTicket: 'Debe quedar al menos un tipo de entrada.',
     lastSeat: 'Debe quedar al menos un tipo de asiento.',
