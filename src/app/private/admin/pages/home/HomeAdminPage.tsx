@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { AdminHomeCardIcon } from '../../../../shared/components/icons/AdminHomeCardIcon';
 import { AdminPageHeader } from '../../../../shared/components/layout/AdminPageHeader';
 import { usePageTexts } from '../../../../../lang';
 
@@ -6,12 +7,12 @@ export function HomeAdminPage() {
   const texts = usePageTexts('admin-home');
 
   const cards = [
-    { title: texts.cards.rooms, route: '/admin/rooms' },
-    { title: texts.cards.movies, route: '/admin/movies' },
-    { title: texts.cards.sessions, route: '/admin/sessions' },
-    { title: texts.cards.users, route: '/admin/users' },
-    { title: texts.cards.reservations, route: '/admin/bookings' },
-    { title: texts.cards.prices, route: '/admin/prices' },
+    { icon: 'rooms' as const, title: texts.cards.rooms, route: '/admin/rooms' },
+    { icon: 'movies' as const, title: texts.cards.movies, route: '/admin/movies' },
+    { icon: 'sessions' as const, title: texts.cards.sessions, route: '/admin/sessions' },
+    { icon: 'users' as const, title: texts.cards.users, route: '/admin/users' },
+    { icon: 'reservations' as const, title: texts.cards.reservations, route: '/admin/bookings' },
+    { icon: 'prices' as const, title: texts.cards.prices, route: '/admin/prices' },
   ];
 
   return (
@@ -23,6 +24,9 @@ export function HomeAdminPage() {
           {cards.map((card) => (
             <Link key={card.route} to={card.route} className="admin-home-card">
               <div className="admin-home-card__inner">
+                <span className="admin-home-card__icon">
+                  <AdminHomeCardIcon name={card.icon} />
+                </span>
                 <h2 className="admin-home-card__title">{card.title}</h2>
               </div>
             </Link>
