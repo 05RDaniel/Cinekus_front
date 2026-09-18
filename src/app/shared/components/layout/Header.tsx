@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../core/context/LanguageContext';
 import { useAuth } from '../../../auth/context/AuthContext';
 import { usePageTexts } from '../../../../lang';
+import logoUrl from '../../../../assets/logo.svg';
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -54,7 +55,7 @@ export function Header() {
       <div className="app-header__inner">
         <div className="app-header__brand">
           <div className="app-header__logo" aria-hidden="true">
-            PC
+            <img src={logoUrl} alt="" />
           </div>
           <span className="app-header__title">{texts.branding.appName}</span>
         </div>
